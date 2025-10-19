@@ -224,17 +224,21 @@
 
       /* === n8n / Notion sync === */
       const HIST_ENDPOINT="https://finbpm3.app.n8n.cloud/webhook/6bf259a0-7012-466b-9a35-314fa54daea3";
-      async function histLoad(){
-        try {
-          const r = await fetch(HIST_ENDPOINT,{ method:"GET" });
-          if(!r.ok) throw new Error(r.status);
-          const j = await r.json();
-          if (j && Array.isArray(j.list)) {
-            try { localStorage.setItem("fbbp_ir_history", JSON.stringify(j.list)); } catch {}
-            setItems(j.list); // оновлюємо стан без reload
-          }
-        } catch(e) { console.warn("Hist load failed", e); }
-      }); if(!r.ok) throw new Error(r.status);
+      async function histLoad() {
+  try {
+    const r = await fetch(HIST_ENDPOINT, { method: "GET" });
+    if (!r.ok) throw new Error(r.status);
+
+    const j = await r.json();
+    if (j && Array.isArray(j.list)) {
+      try { localStorage.setItem("fbbp_ir_history", JSON.stringify(j.list)); } catch {}
+      setItems(j.list); // оновлюємо стан без reload
+    }
+  } catch (e) {
+    console.warn("Hist load failed", e);
+  }
+}
+); if(!r.ok) throw new Error(r.status);
              const j=await r.json(); if(j&&Array.isArray(j.list)){ localStorage.setItem("fbbp_ir_history",JSON.stringify(j.list)); setItems(j.list); // оновлюємо стан без reload } }
         catch(e){ console.warn("Hist load failed",e); }
       }
