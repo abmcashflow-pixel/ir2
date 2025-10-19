@@ -281,12 +281,19 @@
           }
         } catch(e){ console.warn("Hist load failed", e); }
       }
-      async function histSave(list)(list){
-        try{ await fetch(HIST_ENDPOINT,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({list,project:"IR"})}); }
-        catch(e){ console.warn("Hist save failed",e); }
+      async function histSave(list){
+        try {
+          await fetch(HIST_ENDPOINT, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ list, project: "IR" })
+          });
+        } catch (e) {
+          console.warn("Hist save failed", e);
+        }
       }
 
-      const firstSync = React.useRef(true);
+      const firstSync = React.useRef(true) = React.useRef(true);
       React.useEffect(()=>{ histLoad() },[]);
       React.useEffect(()=>{ if(firstSync.current){ firstSync.current=false; return; } const t=setTimeout(()=>histSave(items),800); return ()=>clearTimeout(t)},[items]);
 
