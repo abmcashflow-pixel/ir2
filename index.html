@@ -246,54 +246,21 @@
 
       async function histLoad(){
         try{
-          const r = await fetch(HIST_ENDPOINT,{method:"GET"});
+          const r=await fetch(HIST_ENDPOINT,{method:"GET"});
           if(!r.ok) throw new Error(r.status);
-          const raw = await r.text();
-          let j; try { j = JSON.parse(raw); } catch(parseErr){ console.warn("Hist load: JSON parse failed", parseErr, raw); return; }
-
-          // Normalize possible response shapes:
-          // 1) { list: [...] }
-          // 2) [ { list: [...] } ]
-          // 3) [ {id, date, type, title, summary, link}, ... ]
-          let list = [];
-          if (Array.isArray(j)) {
-            if (j.length && Array.isArray(j[0]?.list)) list = j[0].list;
-            else if (j.every(x => x && typeof x === 'object' && !('list' in x))) list = j; // already items array
-          } else if (j && Array.isArray(j.list)) {
-            list = j.list;
+          const j=await r.json();
+          if(j && Array.isArray(j.list)){
+            try{ localStorage.setItem("fbbp_ir_history", JSON.stringify(j.list)); }catch{}
+            setItems(j.list);
           }
-
-          if (Array.isArray(list)){
-            // Basic sanitize + stable sort by date desc
-            const norm = list.map((x,i)=>({
-              id: String(x.id ?? Date.now()+"-"+i),
-              date: x.date ?? new Date().toISOString(),
-              type: x.type ?? "нотатка",
-              title: x.title ?? "",
-              summary: x.summary ?? "",
-              link: x.link ?? ""
-            })).sort((a,b)=> new Date(b.date) - new Date(a.date));
-
-            try{ localStorage.setItem("fbbp_ir_history", JSON.stringify(norm)); }catch{}
-            setItems(norm);
-          } else {
-            console.warn("Hist load: unsupported shape", j);
-          }
-        } catch(e){ console.warn("Hist load failed", e); }
+        }catch(e){ console.warn("Hist load failed", e); }
       }
       async function histSave(list){
-        try {
-          await fetch(HIST_ENDPOINT, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ list, project: "IR" })
-          });
-        } catch (e) {
-          console.warn("Hist save failed", e);
-        }
+        try{ await fetch(HIST_ENDPOINT,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({list,project:"IR"})}); }
+        catch(e){ console.warn("Hist save failed",e); }
       }
 
-      const firstSync = React.useRef(true) = React.useRef(true);
+      const firstSync = React.useRef(true);
       React.useEffect(()=>{ histLoad() },[]);
       React.useEffect(()=>{ if(firstSync.current){ firstSync.current=false; return; } const t=setTimeout(()=>histSave(items),800); return ()=>clearTimeout(t)},[items]);
 
