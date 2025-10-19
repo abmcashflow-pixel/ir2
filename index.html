@@ -298,6 +298,10 @@
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ list, project: "IR" })
           });
+        } catch (e) {
+          console.warn("Hist save failed", e);
+        }
+      });
         } catch (e) { console.warn("Hist save failed", e); }
       } catch (e) {
           console.warn("Hist save failed", e);
