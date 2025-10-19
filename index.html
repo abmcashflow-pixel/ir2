@@ -226,15 +226,16 @@
       const HIST_ENDPOINT="https://finbpm3.app.n8n.cloud/webhook/6bf259a0-7012-466b-9a35-314fa54daea3";
       async function histLoad(){
         try{ const r=await fetch(HIST_ENDPOINT,{method:"GET"}); if(!r.ok) throw new Error(r.status);
-             const j=await r.json(); if(j&&Array.isArray(j.list)){ localStorage.setItem("fbbp_ir_history",JSON.stringify(j.list)); location.reload(); } }
+             const j=await r.json(); if(j&&Array.isArray(j.list)){ localStorage.setItem("fbbp_ir_history",JSON.stringify(j.list)); setItems(j.list); // оновлюємо стан без reload } }
         catch(e){ console.warn("Hist load failed",e); }
       }
       async function histSave(list){
         try{ await fetch(HIST_ENDPOINT,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({list,project:"IR"})}); }
         catch(e){ console.warn("Hist save failed",e); }
       }
+      const firstSync = React.useRef(true);
       React.useEffect(()=>{ histLoad() },[]);
-      React.useEffect(()=>{ const t=setTimeout(()=>histSave(items),800); return ()=>clearTimeout(t)},[items]);
+      React.useEffect(()=>{ if(firstSync.current){ firstSync.current=false; return; } const t=setTimeout(()=>histSave(items),800); return ()=>clearTimeout(t)},[items]);
 
       return (
         <SectionCard title="Історія взаємодії" subtitle="Саммері зустрічей, питання/відповіді, рішення та нотатки (локальна пам’ять + синк через n8n/Notion)">
@@ -484,7 +485,7 @@
 
     const root=ReactDOM.createRoot(document.getElementById("root"));
     root.render(<App/>);
-    document.getElementById("y").textContent=new Date().getFullYear();
+    const _y=document.getElementById("y"); if(_y) _y.textContent=new Date().getFullYear();
   </script>
 </body>
 </html>
