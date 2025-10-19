@@ -1,507 +1,672 @@
-<!DOCTYPE html>
-<html lang="uk">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Finance BPM · План впровадження ІР</title>
-  <meta name="description" content="Лендінг із планом впровадження Finance BPM для Інвестиційного проєкту (ІР): етапи, задачі, прогрес і контакти." />
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-  <script crossorigin src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --brand-primary: #392EC9;  /* Persian Blue */
-      --brand-accent:  #EF0650;  /* Amaranth */
-      --brand-sky:     #83C8FA;  /* Light Sky Blue */
-      --brand-oxford:  #0B132B;  /* Oxford Blue */
-      --brand-grayBg:  #F5F5FC;
-      --brand-grayLine:#E7E7EA;
-    }
-    body { font-family: Montserrat, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif; }
-  </style>
-</head>
-<body class="min-h-screen bg-[color:var(--brand-grayBg)] text-[color:var(--brand-oxford)]">
-  <div id="root"></div>
+import React, { useEffect, useMemo, useState } from "react";
+// Single-file React app using Tailwind (light theme)
+// Brand: Montserrat font + ABM Cloud colors; minimal dependencies.
+// Tip: You can embed this component in any React app or export static HTML via your build tool.
 
-  <script type="text/babel">
-    const BRAND = {
-      primary: "#392EC9",
-      accent: "#EF0650",
-      sky: "#83C8FA",
-      oxford: "#0B132B",
-      grayBg: "#F5F5FC",
-      grayLine: "#E7E7EA",
+// --- Brand tokens (from brand book) ---
+const BRAND = {
+  primary: "#392EC9", // Persian Blue
+  accent: "#EF0650", // Amaranth
+  sky: "#83C8FA", // Light Sky Blue
+  oxford: "#0B132B", // Oxford Blue (for text)
+  grayBg: "#F5F5FC",
+  grayLine: "#E7E7EA",
+  success: "#5CDE46",
+  danger: "#DE4646",
+};
+
+// --- Utilities ---
+const cls = (...xs) => xs.filter(Boolean).join(" ");
+const MAIL = "mailto:riae@abmcloud.com";
+
+// Persist a boolean map of completed tasks
+function useLocalMap(key, initial) {
+  const [map, setMap] = useState(() => {
+    try {
+      const raw = localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : initial;
+    } catch {
+      return initial;
+    }
+  });
+  useEffect(() => {
+    try {
+      localStorage.setItem(key, JSON.stringify(map));
+    } catch {}
+  }, [key, map]);
+  return [map, setMap];
+}
+
+// --- Data model (condensed from user's final plan) ---
+// Each task is tagged by role: "executor" | "client" | "both".
+// period: "preNY" (Етапи 1–3, до Нового року) | "postNY" (Етапи 4–6)
+const PLAN = [
+  {
+    id: 1,
+    title: "Етап 1. Оновлення ТЗ, підготовка та розгортання",
+    duration: "2–3 тижні",
+    goal:
+      "Узгодити PRD v2.0, розгорнути систему на сервері, організувати аналітику та план реалізації.",
+    period: "preNY",
+    results: [
+      "PRD v2.0 та Project Plan v1.0",
+      "Тестова інстанція Finance BPM (сервер, БД, доступи)",
+      "Узгоджена структура архіву",
+      "Запущений Notion AI Hub",
+      "Демо-сценарій PO–Invoice–Act",
+    ],
+    tasks: [
+      { id: "1.1", text: "3–4 зустрічі для ревізії ТЗ → PRD v2.0 (Implementation Plan)", role: "both" },
+      { id: "1.2", text: "Оновити терміни/логіку процесів (PO, Invoice, Act, архів, погодження)", role: "executor" },
+      { id: "1.3", text: "Узгодити ролі, учасників і канали комунікацій", role: "both" },
+      { id: "1.4", text: "Розгортання: платформа, БД, SMTP/SFTP/API, ролі, логи, бекапи", role: "executor" },
+      { id: "1.5", text: "Аналіз процесів ІР: закупівлі, документообіг, погодження", role: "executor" },
+      { id: "1.6", text: "Сесії з фінансами/закупівлями/бухгалтерією → as‑is/to‑be", role: "both" },
+      { id: "1.7", text: "Структура архіву: тип документа, метадані, доступи", role: "executor" },
+      { id: "1.8", text: "Підготувати PRD структуру та Project Plan у Notion", role: "executor" },
+      { id: "1.9", text: "Погодити Project Plan v1.0 та демо PO–Invoice–Act", role: "both" },
+      { id: "1.10", text: "Approval meeting результатів етапу", role: "client" },
+    ],
+  },
+  {
+    id: 2,
+    title: "Етап 2. Документи, довідники та користувачі",
+    duration: "2–3 тижні",
+    goal:
+      "Створити модель даних: типи документів, довідники, контролі, звіти, користувачі та шаблони друку.",
+    period: "preNY",
+    results: [
+      "Типи документів (PO, Invoice, Act)",
+      "Довідники та контролі",
+      "Шаблони друку, первинні звіти",
+      "Користувачі/ролі/доступи",
+      "Архівні дані у системі",
+    ],
+    tasks: [
+      { id: "2.1", text: "Створити PO, Invoice, Act (типи документів)", role: "executor" },
+      { id: "2.2", text: "Налаштувати довідники: контрагенти, договори, підрозділи, валюти, статті", role: "executor" },
+      { id: "2.3", text: "Контролі: унікальність, узгодження сум/статусів, обов’язкові поля", role: "executor" },
+      { id: "2.4", text: "Звіти: Баланс по PO; Баланс по постачальнику", role: "executor" },
+      { id: "2.5", text: "Шаблони друку (PDF/XLSX) ↔ узгодження макетів", role: "both" },
+      { id: "2.6", text: "Імпорт користувачів (Excel/AD), ролі Viewer/Editor/Approver/Admin", role: "executor" },
+      { id: "2.7", text: "Перевірка доступів та імпорт архіва до модуля ‘Архів’", role: "both" },
+    ],
+  },
+  {
+    id: 3,
+    title: "Етап 3. Бізнес‑процеси",
+    duration: "2 тижні",
+    goal:
+      "Налаштувати погодження документів, ролі/доступи за статусами, нотифікації та провести UAT процесів.",
+    period: "preNY",
+    results: [
+      "Робочі погодження для PO/Invoice/Act",
+      "Форми задач/виконавці",
+      "Business Process Overview v1.0",
+    ],
+    tasks: [
+      { id: "3.1", text: "Побудувати маршрути погоджень PO/Invoice/Act", role: "executor" },
+      { id: "3.2", text: "Стани, правила переходів, виконавці", role: "executor" },
+      { id: "3.3", text: "Доступи/ролі залежно від статусу", role: "executor" },
+      { id: "3.4", text: "Автоповідомлення авторам про ‘незакриті’ документи", role: "executor" },
+      { id: "3.5", text: "UAT погоджень з ключовими користувачами", role: "both" },
+      { id: "3.6", text: "За потреби спростити UX (короткі маршрути / групові рішення)", role: "executor" },
+    ],
+  },
+  {
+    id: 4,
+    title: "Етап 4. Реєстри та інтеграції з SAP",
+    duration: "2 тижні",
+    goal:
+      "Забезпечити реєстри документів і обміни з SAP (SFTP/API) з моніторингом і логуванням.",
+    period: "postNY",
+    results: [
+      "Реєстри погоджених документів",
+      "Інтеграції з SAP налаштовано",
+      "Протокол інтеграційних тестів",
+    ],
+    tasks: [
+      { id: "4.1", text: "Реєстри Invoice/Act з фільтрами, пошуком, масовими діями", role: "executor" },
+      { id: "4.2", text: "SAP: імпорт контрагентів, експорт погоджених документів (SFTP/API)", role: "executor" },
+      { id: "4.3", text: "Моніторинг/логування обмінів + алерти збоїв", role: "executor" },
+      { id: "4.4", text: "Інтеграційні тести з ІТ‑службою клієнта", role: "both" },
+    ],
+  },
+  {
+    id: 5,
+    title: "Етап 5. Тестування та запуск",
+    duration: "2–3 тижні",
+    goal:
+      "Пройти UAT, підготувати інструкції, виправити дефекти і вийти у дослідну експлуатацію (Go‑Live).",
+    period: "postNY",
+    results: [
+      "Система пройшла тестування",
+      "Користувачі готові",
+      "Акт приймання‑передачі",
+      "Система в дослідній експлуатації",
+    ],
+    tasks: [
+      { id: "5.1", text: "UAT з клієнтом та формування UAT‑команди", role: "both" },
+      { id: "5.2", text: "Sandbox для безпечного тестування нових змін", role: "executor" },
+      { id: "5.3", text: "Інструкції користувача та адміністратора", role: "executor" },
+      { id: "5.4", text: "Виправити помилки / оптимізувати сценарії", role: "executor" },
+      { id: "5.5", text: "Підготовка до Go‑Live", role: "both" },
+    ],
+  },
+  {
+    id: 6,
+    title: "Етап 6. Післяпроєктна підтримка та розвиток",
+    duration: "постійно",
+    goal:
+      "Моніторинг, оновлення модулів, AI‑протоколювання (Notion+n8n), збір фідбеку й план розвитку.",
+    period: "postNY",
+    results: [
+      "Стабільна робота системи",
+      "AI Hub / дайджести",
+      "Задокументована історія змін",
+    ],
+    tasks: [
+      { id: "6.1", text: "Моніторинг обмінів, логів, резервного копіювання", role: "executor" },
+      { id: "6.2", text: "Оновлення модулів, розширення функцій", role: "executor" },
+      { id: "6.3", text: "Автоматичні саммарі/дайджести/архів (Notion + n8n)", role: "executor" },
+      { id: "6.4", text: "Збір фідбеку та безперервна UX‑оптимізація", role: "both" },
+      { id: "6.5", text: "Планування і реалізація покращень", role: "both" },
+    ],
+  },
+];
+
+// --- Components ---
+
+// Local list helper for Interaction History
+function useLocalList(key, initial) {
+  const [list, setList] = React.useState(() => {
+    try {
+      const raw = localStorage.getItem(key)
+      return raw ? JSON.parse(raw) : initial
+    } catch { return initial }
+  })
+  React.useEffect(() => {
+    try { localStorage.setItem(key, JSON.stringify(list)) } catch {}
+  }, [key, list])
+  return [list, setList]
+}
+
+const HISTORY_TYPES = ["зустріч", "питання", "відповідь", "рішення", "нотатка"]
+
+function Pill({label, active, onClick}){
+  return (
+    <button onClick={onClick} className={cls(
+      "px-3 py-1 rounded-full text-xs border transition",
+      active ? "bg-white border-[color:var(--brand-primary)] text-[color:var(--brand-primary)] shadow" : "bg-white border-gray-200 text-gray-600 hover:text-gray-900"
+    )}>{label}</button>
+  )
+}
+
+function InteractionHistory(){
+  const [items, setItems] = useLocalList("fbbp_ir_history", [])
+  const [typeFilter, setTypeFilter] = React.useState("all")
+  const [q, setQ] = React.useState("")
+  const [openForm, setOpenForm] = React.useState(false)
+  const [form, setForm] = React.useState({type: "зустріч", title: "", summary: "", link: ""})
+
+  const filtered = React.useMemo(() => {
+    const tOk = (x)=> typeFilter === "all" || x.type === typeFilter
+    const qlc = q.trim().toLowerCase()
+    return items
+      .filter(x => tOk(x) && (!qlc || (x.title+" "+x.summary).toLowerCase().includes(qlc)))
+      .sort((a,b)=> new Date(b.date) - new Date(a.date))
+  }, [items, typeFilter, q])
+
+  function addItem(){
+    if(!form.title.trim() && !form.summary.trim()) return
+    const it = { id: Date.now(), date: new Date().toISOString(), ...form }
+    setItems(prev => [it, ...prev])
+    setForm({type: form.type, title: "", summary: "", link: ""})
+    setOpenForm(false)
+  }
+  function removeItem(id){ setItems(prev => prev.filter(x=>x.id!==id)) }
+  function clearAll(){ if(confirm("Очистити всю історію?")) setItems([]) }
+  function fmt(d){ try { return new Date(d).toLocaleString("uk-UA") } catch { return d } }
+
+  return (
+    <SectionCard title="Історія взаємодії" subtitle="Саммері зустрічей, питання/відповіді, рішення та нотатки (локальна пам’ять; можна під’єднати n8n/Notion)">
+      <div className="space-y-4">
+        <div className="flex flex-wrap items-center gap-2">
+          <Pill label="Всі" active={typeFilter==="all"} onClick={()=>setTypeFilter("all")} />
+          {HISTORY_TYPES.map(t=> (
+            <Pill key={t} label={t} active={typeFilter===t} onClick={()=>setTypeFilter(t)} />
+          ))}
+          <div className="flex-1" />
+          <input value={q} onChange={e=>setQ(e.target.value)} placeholder="Пошук по історії…" className="w-full md:w-64 px-3 py-2 text-sm border rounded-md" />
+          <button onClick={()=>setOpenForm(v=>!v)} className="px-3 py-2 text-sm rounded-md border border-[color:var(--brand-primary)] text-[color:var(--brand-primary)] hover:bg-[color:var(--brand-primary)] hover:text-white">{openForm?"Сховати форму":"Додати запис"}</button>
+        </div>
+
+        {openForm && (
+          <div className="grid md:grid-cols-4 gap-3 bg-white rounded-xl border border-[color:var(--brand-grayLine)] p-4">
+            <div>
+              <div className="text-xs text-gray-500 mb-1">Тип</div>
+              <select value={form.type} onChange={e=>setForm({...form, type:e.target.value})} className="w-full px-3 py-2 text-sm border rounded-md">
+                {HISTORY_TYPES.map(t=> <option key={t} value={t}>{t}</option>)}
+              </select>
+            </div>
+            <div className="md:col-span-3">
+              <div className="text-xs text-gray-500 mb-1">Заголовок</div>
+              <input value={form.title} onChange={e=>setForm({...form, title:e.target.value})} className="w-full px-3 py-2 text-sm border rounded-md" placeholder="Напр. Саммері дзвінка з CFO" />
+            </div>
+            <div className="md:col-span-3">
+              <div className="text-xs text-gray-500 mb-1">Короткий зміст</div>
+              <textarea value={form.summary} onChange={e=>setForm({...form, summary:e.target.value})} className="w-full px-3 py-2 text-sm border rounded-md" rows={3} placeholder="Основні тези, рішення, питання/відповіді…" />
+            </div>
+            <div>
+              <div className="text-xs text-gray-500 mb-1">Посилання (опц.)</div>
+              <input value={form.link} onChange={e=>setForm({...form, link:e.target.value})} className="w-full px-3 py-2 text-sm border rounded-md" placeholder="Notion / Meet / Doc" />
+            </div>
+            <div className="md:col-span-4 flex justify-end gap-2">
+              <button onClick={addItem} className="px-3 py-2 text-sm rounded-md bg-[color:var(--brand-primary)] text-white">Зберегти</button>
+              <button onClick={()=>setOpenForm(false)} className="px-3 py-2 text-sm rounded-md border">Скасувати</button>
+            </div>
+          </div>
+        )}
+
+        <div className="space-y-3">
+          {filtered.length === 0 && (
+            <div className="text-sm text-gray-500 border border-dashed rounded-xl p-4">
+              Поки що порожньо. Додай перший запис — наприклад, саммері останнього колу або список відкритих питань.
+            </div>
+          )}
+          {filtered.map(it => (
+            <div key={it.id} className="bg-white rounded-xl border border-[color:var(--brand-grayLine)] p-4">
+              <div className="flex items-center gap-2 text-xs text-gray-500">
+                <span className="px-2 py-0.5 rounded-full border">{it.type}</span>
+                <span>·</span>
+                <span>{fmt(it.date)}</span>
+                <div className="flex-1" />
+                <button onClick={()=>removeItem(it.id)} className="text-xs text-gray-400 hover:text-red-600">Видалити</button>
+              </div>
+              {it.title && <div className="mt-1 text-sm font-semibold">{it.title}</div>}
+              {it.summary && <div className="mt-1 text-sm text-gray-700 whitespace-pre-wrap">{it.summary}</div>}
+              {it.link && <a href={it.link} target="_blank" rel="noreferrer" className="mt-2 inline-block text-sm text-[color:var(--brand-primary)] underline">Перейти до джерела</a>}
+            </div>
+          ))}
+        </div>
+
+        <div className="flex items-center justify-between text-xs text-gray-500 pt-2">
+          <div>
+            Зберігається локально у браузері. Можна підключити n8n/Notion для спільної пам’яті (див. коментарі у файлі).
+          </div>
+          {items.length>0 && <button onClick={clearAll} className="hover:text-gray-800">Очистити все</button>}
+        </div>
+
+        {/* n8n/Notion sync — активовано (налаштуй URL нижче) */}
+        const HIST_ENDPOINT = "https://finbpm3.app.n8n.cloud/webhook/6bf259a0-7012-466b-9a35-314fa54daea3"; // <- заміни на свій вебхук
+        async function histLoad(){
+          try {
+            const r = await fetch(HIST_ENDPOINT, { method: "GET" });
+            if(!r.ok) throw new Error("HTTP "+r.status)
+            const j = await r.json();
+            if(j && Array.isArray(j.list)){
+              localStorage.setItem("fbbp_ir_history", JSON.stringify(j.list));
+            }
+          } catch(e){ console.warn("Hist load failed", e) }
+        }
+        async function histSave(list){
+          try {
+            await fetch(HIST_ENDPOINT, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ list, project: "IR" }) })
+          } catch(e){ console.warn("Hist save failed", e) }
+        }
+        React.useEffect(()=>{ histLoad() }, [])
+        React.useEffect(()=>{
+          const t = setTimeout(()=>{ histSave(items) }, 800) // debounce
+          return ()=> clearTimeout(t)
+        }, [items])
+        <div className="flex items-center justify-end text-xs text-gray-400">
+          <button onClick={()=>histLoad()} className="underline">Оновити з Notion</button>
+          <span className="mx-2 opacity-40">·</span>
+          <button onClick={()=>histSave(items)} className="underline">Зберегти в Notion</button>
+        </div>
+      </div>
+    </SectionCard>
+  )
+}
+
+function StagePill({ label, active, onClick }) {
+  return (
+    <button
+      onClick={onClick}
+      className={cls(
+        "px-3 py-1 rounded-full text-sm border transition",
+        active
+          ? "bg-white border-[color:var(--brand-primary)] text-[color:var(--brand-primary)] shadow"
+          : "bg-white/70 border-gray-200 text-gray-600 hover:text-gray-900"
+      )}
+    >
+      {label}
+    </button>
+  );
+}
+
+function FilterChip({ label, active, onClick }) {
+  return (
+    <button
+      onClick={onClick}
+      className={cls(
+        "px-3 py-1 rounded-full text-xs border",
+        active ? "bg-[color:var(--brand-sky)]/20 border-[color:var(--brand-sky)]" : "bg-white border-gray-200"
+      )}
+    >
+      {label}
+    </button>
+  );
+}
+
+function ProgressBar({ value }) {
+  return (
+    <div className="w-full h-3 bg-gray-200 rounded-full overflow-hidden">
+      <div
+        className="h-full rounded-full"
+        style={{ width: `${Math.min(100, Math.max(0, value))}%`, background: `linear-gradient(90deg, ${BRAND.primary}, ${BRAND.accent})` }}
+      />
+    </div>
+  );
+}
+
+function SectionCard({ title, subtitle, children, right }) {
+  return (
+    <section className="bg-white shadow-sm rounded-2xl border border-gray-100 p-5 md:p-6">
+      <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mb-4">
+        <div className="flex-1">
+          <h3 className="text-xl font-semibold text-[color:var(--brand-oxford)]">{title}</h3>
+          {subtitle && <p className="text-sm text-gray-500">{subtitle}</p>}
+        </div>
+        {right}
+      </div>
+      {children}
+    </section>
+  );
+}
+
+function TaskRow({ stageId, task, doneMap, setDoneMap }) {
+  const key = `${stageId}:${task.id}`;
+  const done = !!doneMap[key];
+  return (
+    <label className="flex items-start gap-3 py-2 group cursor-pointer">
+      <input
+        type="checkbox"
+        checked={done}
+        onChange={(e) => setDoneMap((m) => ({ ...m, [key]: e.target.checked }))}
+        className="mt-1 h-4 w-4 rounded border-gray-300 text-[color:var(--brand-primary)] focus:ring-[color:var(--brand-primary)]"
+      />
+      <div className={cls("flex-1 text-sm leading-relaxed", done ? "line-through text-gray-400" : "text-gray-800")}>{task.text}</div>
+      <span
+        className={cls(
+          "text-[10px] uppercase tracking-wide px-2 py-1 rounded-full border",
+          task.role === "executor"
+            ? "bg-[color:var(--brand-primary)]/8 border-[color:var(--brand-primary)] text-[color:var(--brand-primary)]"
+            : task.role === "client"
+            ? "bg-[color:var(--brand-accent)]/10 border-[color:var(--brand-accent)] text-[color:var(--brand-accent)]"
+            : "bg-[color:var(--brand-sky)]/20 border-[color:var(--brand-sky)] text-[color:var(--brand-oxford)]"
+        )}
+        title={task.role === "executor" ? "Задача виконавця" : task.role === "client" ? "Задача клієнта" : "Спільна задача"}
+      >
+        {task.role === "executor" ? "виконавець" : task.role === "client" ? "клієнт" : "разом"}
+      </span>
+    </label>
+  );
+}
+
+// --- Main App ---
+export default function FinanceBpmPlanLanding() {
+  // Inject Montserrat font + CSS variables
+  useEffect(() => {
+    const link = document.createElement("link");
+    link.href = "https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap";
+    link.rel = "stylesheet";
+    document.head.appendChild(link);
+
+    const root = document.documentElement;
+    root.style.setProperty("--brand-primary", BRAND.primary);
+    root.style.setProperty("--brand-accent", BRAND.accent);
+    root.style.setProperty("--brand-sky", BRAND.sky);
+    root.style.setProperty("--brand-oxford", BRAND.oxford);
+    root.style.setProperty("--brand-grayBg", BRAND.grayBg);
+    root.style.setProperty("--brand-grayLine", BRAND.grayLine);
+    document.body.style.fontFamily = 'Montserrat, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif';
+    return () => {
+      try { document.head.removeChild(link); } catch {}
     };
-    const MAIL = "mailto:riae@abmcloud.com";
-    const cls = (...xs) => xs.filter(Boolean).join(" ");
+  }, []);
 
-    // Local storage map helper
-    function useLocalMap(key, initial) {
-      const [map, setMap] = React.useState(() => {
-        try {
-          const raw = localStorage.getItem(key);
-          return raw ? JSON.parse(raw) : initial;
-        } catch { return initial; }
-      });
-      React.useEffect(() => {
-        try { localStorage.setItem(key, JSON.stringify(map)); } catch {}
-      }, [key, map]);
-      return [map, setMap];
+  const [doneMap, setDoneMap] = useLocalMap("fbbp_ir_doneMap", {});
+  const [stageFilter, setStageFilter] = useState("all"); // all | 1..6
+  const [roleFilter, setRoleFilter] = useState(["executor", "client", "both"]);
+  const [periodFilter, setPeriodFilter] = useState("all"); // all | preNY | postNY
+  const [statusFilter, setStatusFilter] = useState("all"); // all | done | notdone
+
+  // Derived stats
+  const flatTasks = useMemo(() =>
+    PLAN.flatMap((s) => s.tasks.map((t) => ({ stageId: s.id, ...t }))),
+  []);
+
+  const totalTasks = flatTasks.length;
+  const doneCount = flatTasks.reduce((acc, t) => (doneMap[`${t.stageId}:${t.id}`] ? acc + 1 : acc), 0);
+  const progress = Math.round((doneCount / Math.max(1, totalTasks)) * 100);
+
+  const currentStageIndex = useMemo(() => {
+    // First stage that still has NOT all tasks done
+    for (let i = 0; i < PLAN.length; i++) {
+      const s = PLAN[i];
+      const allDone = s.tasks.every((t) => doneMap[`${s.id}:${t.id}`]);
+      if (!allDone) return i;
     }
+    return PLAN.length - 1;
+  }, [doneMap]);
 
-    // Data (stages/tasks) — condensed from the final plan
-    const PLAN = [
-      {
-        id: 1,
-        title: "Етап 1. Оновлення ТЗ, підготовка та розгортання",
-        duration: "2–3 тижні",
-        goal: "Узгодити PRD v2.0, розгорнути систему на сервері, організувати аналітику та план реалізації.",
-        period: "preNY",
-        results: [
-          "PRD v2.0 та Project Plan v1.0",
-          "Тестова інстанція Finance BPM (сервер, БД, доступи)",
-          "Узгоджена структура архіву",
-          "Запущений Notion AI Hub",
-          "Демо-сценарій PO–Invoice–Act",
-        ],
-        tasks: [
-          { id: "1.1", text: "3–4 зустрічі для ревізії ТЗ → PRD v2.0 (Implementation Plan)", role: "both" },
-          { id: "1.2", text: "Оновити терміни/логіку процесів (PO, Invoice, Act, архів, погодження)", role: "executor" },
-          { id: "1.3", text: "Узгодити ролі, учасників і канали комунікацій", role: "both" },
-          { id: "1.4", text: "Розгортання: платформа, БД, SMTP/SFTP/API, ролі, логи, бекапи", role: "executor" },
-          { id: "1.5", text: "Аналіз процесів ІР: закупівлі, документообіг, погодження", role: "executor" },
-          { id: "1.6", text: "Сесії з фінансами/закупівлями/бухгалтерією → as‑is/to‑be", role: "both" },
-          { id: "1.7", text: "Структура архіву: тип документа, метадані, доступи", role: "executor" },
-          { id: "1.8", text: "Підготувати PRD структуру та Project Plan у Notion", role: "executor" },
-          { id: "1.9", text: "Погодити Project Plan v1.0 та демо PO–Invoice–Act", role: "both" },
-          { id: "1.10", text: "Approval meeting результатів етапу", role: "client" },
-        ],
-      },
-      {
-        id: 2,
-        title: "Етап 2. Документи, довідники та користувачі",
-        duration: "2–3 тижні",
-        goal: "Створити модель даних: типи документів, довідники, контролі, звіти, користувачі та шаблони друку.",
-        period: "preNY",
-        results: [
-          "Типи документів (PO, Invoice, Act)",
-          "Довідники та контролі",
-          "Шаблони друку, первинні звіти",
-          "Користувачі/ролі/доступи",
-          "Архівні дані у системі",
-        ],
-        tasks: [
-          { id: "2.1", text: "Створити PO, Invoice, Act (типи документів)", role: "executor" },
-          { id: "2.2", text: "Налаштувати довідники: контрагенти, договори, підрозділи, валюти, статті", role: "executor" },
-          { id: "2.3", text: "Контролі: унікальність, узгодження сум/статусів, обов’язкові поля", role: "executor" },
-          { id: "2.4", text: "Звіти: Баланс по PO; Баланс по постачальнику", role: "executor" },
-          { id: "2.5", text: "Шаблони друку (PDF/XLSX) ↔ узгодження макетів", role: "both" },
-          { id: "2.6", text: "Імпорт користувачів (Excel/AD), ролі Viewer/Editor/Approver/Admin", role: "executor" },
-          { id: "2.7", text: "Перевірка доступів та імпорт архіва до модуля ‘Архів’", role: "both" },
-        ],
-      },
-      {
-        id: 3,
-        title: "Етап 3. Бізнес‑процеси",
-        duration: "2 тижні",
-        goal: "Налаштувати погодження документів, ролі/доступи за статусами, нотифікації та провести UAT процесів.",
-        period: "preNY",
-        results: [
-          "Робочі погодження для PO/Invoice/Act",
-          "Форми задач/виконавці",
-          "Business Process Overview v1.0",
-        ],
-        tasks: [
-          { id: "3.1", text: "Побудувати маршрути погоджень PO/Invoice/Act", role: "executor" },
-          { id: "3.2", text: "Стани, правила переходів, виконавці", role: "executor" },
-          { id: "3.3", text: "Доступи/ролі залежно від статусу", role: "executor" },
-          { id: "3.4", text: "Автоповідомлення авторам про ‘незакриті’ документи", role: "executor" },
-          { id: "3.5", text: "UAT погоджень з ключовими користувачами", role: "both" },
-          { id: "3.6", text: "За потреби спростити UX (короткі маршрути / групові рішення)", role: "executor" },
-        ],
-      },
-      {
-        id: 4,
-        title: "Етап 4. Реєстри та інтеграції з SAP",
-        duration: "2 тижні",
-        goal: "Забезпечити реєстри документів і обміни з SAP (SFTP/API) з моніторингом і логуванням.",
-        period: "postNY",
-        results: [
-          "Реєстри погоджених документів",
-          "Інтеграції з SAP налаштовано",
-          "Протокол інтеграційних тестів",
-        ],
-        tasks: [
-          { id: "4.1", text: "Реєстри Invoice/Act з фільтрами, пошуком, масовими діями", role: "executor" },
-          { id: "4.2", text: "SAP: імпорт контрагентів, експорт погоджених документів (SFTP/API)", role: "executor" },
-          { id: "4.3", text: "Моніторинг/логування обмінів + алерти збоїв", role: "executor" },
-          { id: "4.4", text: "Інтеграційні тести з ІТ‑службою клієнта", role: "both" },
-        ],
-      },
-      {
-        id: 5,
-        title: "Етап 5. Тестування та запуск",
-        duration: "2–3 тижні",
-        goal: "Пройти UAT, підготувати інструкції, виправити дефекти і вийти у дослідну експлуатацію (Go‑Live).",
-        period: "postNY",
-        results: [
-          "Система пройшла тестування",
-          "Користувачі готові",
-          "Акт приймання‑передачі",
-          "Система в дослідній експлуатації",
-        ],
-        tasks: [
-          { id: "5.1", text: "UAT з клієнтом та формування UAT‑команди", role: "both" },
-          { id: "5.2", text: "Sandbox для безпечного тестування нових змін", role: "executor" },
-          { id: "5.3", text: "Інструкції користувача та адміністратора", role: "executor" },
-          { id: "5.4", text: "Виправити помилки / оптимізувати сценарії", role: "executor" },
-          { id: "5.5", text: "Підготовка до Go‑Live", role: "both" },
-        ],
-      },
-      {
-        id: 6,
-        title: "Етап 6. Післяпроєктна підтримка та розвиток",
-        duration: "постійно",
-        goal: "Моніторинг, оновлення модулів, AI‑протоколювання (Notion+n8n), збір фідбеку й план розвитку.",
-        period: "postNY",
-        results: [
-          "Стабільна робота системи",
-          "AI Hub / дайджести",
-          "Задокументована історія змін",
-        ],
-        tasks: [
-          { id: "6.1", text: "Моніторинг обмінів, логів, резервного копіювання", role: "executor" },
-          { id: "6.2", text: "Оновлення модулів, розширення функцій", role: "executor" },
-          { id: "6.3", text: "Автоматичні саммарі/дайджести/архів (Notion + n8n)", role: "executor" },
-          { id: "6.4", text: "Збір фідбеку та безперервна UX‑оптимізація", role: "both" },
-          { id: "6.5", text: "Планування і реалізація покращень", role: "both" },
-        ],
-      },
-    ];
+  const filteredStages = PLAN.filter((s) => {
+    const byStage = stageFilter === "all" || s.id === Number(stageFilter);
+    const byPeriod = periodFilter === "all" || s.period === periodFilter;
+    return byStage && byPeriod;
+  });
 
-    function StagePill({ label, active, onClick }) {
-      return (
-        <button
-          onClick={onClick}
-          className={cls(
-            "px-3 py-1 rounded-full text-sm border transition",
-            active ? "bg-white border-[color:var(--brand-primary)] text-[color:var(--brand-primary)] shadow"
-                   : "bg-white/70 border-gray-200 text-gray-600 hover:text-gray-900"
-          )}
-        >{label}</button>
-      );
+  const roleSet = new Set(roleFilter);
+
+  function filterTaskPredicate(stageId, task) {
+    const roleOk = roleSet.has(task.role);
+    const key = `${stageId}:${task.id}`;
+    const done = !!doneMap[key];
+    const statusOk =
+      statusFilter === "all" || (statusFilter === "done" && done) || (statusFilter === "notdone" && !done);
+    return roleOk && statusOk;
+  }
+
+  const stageScrollTo = (id) => {
+    const el = document.getElementById(`stage-${id}`);
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
+  const resetAll = () => {
+    if (confirm("Очистити позначки виконання для всіх задач?")) {
+      localStorage.removeItem("fbbp_ir_doneMap");
+      window.location.reload();
     }
+  };
 
-    function FilterChip({ label, active, onClick }) {
-      return (
-        <button
-          onClick={onClick}
-          className={cls(
-            "px-3 py-1 rounded-full text-xs border",
-            active ? "bg-[color:var(--brand-sky)]/20 border-[color:var(--brand-sky)]"
-                   : "bg-white border-gray-200"
-          )}
-        >{label}</button>
-      );
-    }
-
-    function ProgressBar({ value }) {
-      return (
-        <div className="w-full h-3 bg-gray-200 rounded-full overflow-hidden">
-          <div className="h-full rounded-full" style={{
-            width: Math.min(100, Math.max(0, value)) + "%",
-            background: `linear-gradient(90deg, ${BRAND.primary}, ${BRAND.accent})`
-          }}/>
-        </div>
-      );
-    }
-
-    function SectionCard({ title, subtitle, children, right }) {
-      return (
-        <section className="bg-white shadow-sm rounded-2xl border border-gray-100 p-5 md:p-6">
-          <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mb-4">
-            <div className="flex-1">
-              <h3 className="text-xl font-semibold text-[color:var(--brand-oxford)]">{title}</h3>
-              {subtitle && <p className="text-sm text-gray-500">{subtitle}</p>}
-            </div>
-            {right}
+  return (
+    <div className="min-h-screen bg-[color:var(--brand-grayBg)] text-[color:var(--brand-oxford)]">
+      {/* Header */}
+      <header className="sticky top-0 z-40 backdrop-blur bg-white/80 border-b border-[color:var(--brand-grayLine)]">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 py-3 flex items-center gap-4">
+          <div className="h-9 w-9 rounded-full" style={{ background: `conic-gradient(from 180deg, ${BRAND.primary}, ${BRAND.accent})` }} />
+          <div className="flex-1">
+            <h1 className="text-base md:text-lg font-semibold">Finance BPM · План впровадження ІР</h1>
+            <p className="text-[11px] md:text-xs text-gray-500">Версія 1.3 · Жовтень 2025 · Світла тема</p>
           </div>
-          {children}
-        </section>
-      );
-    }
+          <nav className="hidden md:flex gap-2">
+            {PLAN.map((s) => (
+              <StagePill key={s.id} label={`Етап ${s.id}`} active={s.id - 1 === currentStageIndex} onClick={() => stageScrollTo(s.id)} />
+            ))}
+          </nav>
+          <a href={MAIL} className="text-sm px-3 py-1 rounded-md border border-[color:var(--brand-primary)] text-[color:var(--brand-primary)] hover:bg-[color:var(--brand-primary)] hover:text-white transition">Контакти</a>
+        </div>
+      </header>
 
-    function TaskRow({ stageId, task, doneMap, setDoneMap }) {
-      const key = `${stageId}:${task.id}`;
-      const done = !!doneMap[key];
-      return (
-        <label className="flex items-start gap-3 py-2 group cursor-pointer">
-          <input
-            type="checkbox"
-            checked={done}
-            onChange={e => setDoneMap(m => ({ ...m, [key]: e.target.checked }))}
-            className="mt-1 h-4 w-4 rounded border-gray-300 text-[color:var(--brand-primary)] focus:ring-[color:var(--brand-primary)]"
-          />
-          <div className={cls("flex-1 text-sm leading-relaxed", done ? "line-through text-gray-400" : "text-gray-800")}>{task.text}</div>
-          <span
-            className={cls(
-              "text-[10px] uppercase tracking-wide px-2 py-1 rounded-full border",
-              task.role === "executor"
-                ? "bg-[color:var(--brand-primary)]/8 border-[color:var(--brand-primary)] text-[color:var(--brand-primary)]"
-                : task.role === "client"
-                ? "bg-[color:var(--brand-accent)]/10 border-[color:var(--brand-accent)] text-[color:var(--brand-accent)]"
-                : "bg-[color:var(--brand-sky)]/20 border-[color:var(--brand-sky)] text-[color:var(--brand-oxford)]"
-            )}
-            title={task.role === "executor" ? "Задача виконавця" : task.role === "client" ? "Задача клієнта" : "Спільна задача"}
+      {/* Hero / Progress */}
+      <div className="max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-10">
+        <div className="grid md:grid-cols-3 gap-5">
+          <SectionCard
+            title="Прогрес проєкту"
+            subtitle="На головній – інтерактивний графік прогресу і маркери етапів"
+            right={<div className="text-right"><div className="text-sm text-gray-500">Завершено</div><div className="text-lg font-semibold">{doneCount} / {totalTasks}</div></div>}
           >
-            {task.role === "executor" ? "виконавець" : task.role === "client" ? "клієнт" : "разом"}
-          </span>
-        </label>
-      );
-    }
-
-    function App() {
-      const [doneMap, setDoneMap] = useLocalMap("fbbp_ir_doneMap", {});
-      const [stageFilter, setStageFilter] = React.useState("all");
-      const [roleFilter, setRoleFilter] = React.useState(["executor", "client", "both"]);
-      const [periodFilter, setPeriodFilter] = React.useState("all");
-      const [statusFilter, setStatusFilter] = React.useState("all");
-
-      // Progress
-      const flatTasks = React.useMemo(() => PLAN.flatMap(s => s.tasks.map(t => ({ stageId: s.id, ...t }))), []);
-      const totalTasks = flatTasks.length;
-      const doneCount = flatTasks.reduce((acc, t) => (doneMap[`${t.stageId}:${t.id}`] ? acc + 1 : acc), 0);
-      const progress = Math.round((doneCount / Math.max(1, totalTasks)) * 100);
-
-      const currentStageIndex = React.useMemo(() => {
-        for (let i = 0; i < PLAN.length; i++) {
-          const s = PLAN[i];
-          const allDone = s.tasks.every(t => doneMap[`${s.id}:${t.id}`]);
-          if (!allDone) return i;
-        }
-        return PLAN.length - 1;
-      }, [doneMap]);
-
-      // Filters
-      const filteredStages = PLAN.filter(s => {
-        const byStage = stageFilter === "all" || s.id === Number(stageFilter);
-        const byPeriod = periodFilter === "all" || s.period === periodFilter;
-        return byStage && byPeriod;
-      });
-      const roleSet = new Set(roleFilter);
-      function taskOk(stageId, task) {
-        const roleOk = roleSet.has(task.role);
-        const key = `${stageId}:${task.id}`;
-        const done = !!doneMap[key];
-        const statusOk = statusFilter === "all" || (statusFilter === "done" && done) || (statusFilter === "notdone" && !done);
-        return roleOk && statusOk;
-      }
-
-      const stageScrollTo = (id) => {
-        const el = document.getElementById(`stage-${id}`);
-        if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-      };
-      const resetAll = () => {
-        if (confirm("Очистити позначки виконання для всіх задач?")) {
-          localStorage.removeItem("fbbp_ir_doneMap");
-          window.location.reload();
-        }
-      };
-
-      return (
-        <div>
-          {/* Header */}
-          <header className="sticky top-0 z-40 backdrop-blur bg-white/80 border-b border-[color:var(--brand-grayLine)]">
-            <div className="max-w-7xl mx-auto px-4 md:px-6 py-3 flex items-center gap-4">
-              <div className="h-9 w-9 rounded-full" style={{ background: `conic-gradient(from 180deg, ${BRAND.primary}, ${BRAND.accent})` }} />
-              <div className="flex-1">
-                <h1 className="text-base md:text-lg font-semibold">Finance BPM · План впровадження ІР</h1>
-                <p className="text-[11px] md:text-xs text-gray-500">Версія 1.3 · Жовтень 2025 · Світла тема</p>
+            <div className="space-y-3">
+              <ProgressBar value={progress} />
+              <div className="flex items-center justify-between text-xs text-gray-500">
+                {PLAN.map((s, i) => {
+                  const allDone = s.tasks.every((t) => doneMap[`${s.id}:${t.id}`]);
+                  return (
+                    <button
+                      key={s.id}
+                      onClick={() => stageScrollTo(s.id)}
+                      className={cls(
+                        "flex-1 h-2 mx-0.5 rounded-full",
+                        allDone ? "bg-[color:var(--brand-primary)]" : i === currentStageIndex ? "bg-[color:var(--brand-accent)]" : "bg-gray-300"
+                      )}
+                      title={`${s.title}`}
+                    />
+                  );
+                })}
               </div>
-              <nav className="hidden md:flex gap-2">
-                {PLAN.map((s, i) => (
-                  <StagePill key={s.id} label={`Етап ${s.id}`} active={s.id - 1 === currentStageIndex} onClick={() => stageScrollTo(s.id)} />
-                ))}
-              </nav>
-              <a href={MAIL} className="text-sm px-3 py-1 rounded-md border border-[color:var(--brand-primary)] text-[color:var(--brand-primary)] hover:bg-[color:var(--brand-primary)] hover:text-white transition">Контакти</a>
+              <div className="text-xs text-gray-600">Поточний етап: <span className="font-medium">Етап {currentStageIndex + 1}</span></div>
             </div>
-          </header>
+          </SectionCard>
 
-          {/* Hero/Progress */}
-          <div className="max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-10">
-            <div className="grid md:grid-cols-3 gap-5">
-              <SectionCard
-                title="Прогрес проєкту"
-                subtitle="На головній – інтерактивний графік прогресу і маркери етапів"
-                right={<div className="text-right"><div className="text-sm text-gray-500">Завершено</div><div className="text-lg font-semibold">{doneCount} / {totalTasks}</div></div>}
-              >
-                <div className="space-y-3">
-                  <ProgressBar value={progress} />
-                  <div className="flex items-center justify-between text-xs text-gray-500">
-                    {PLAN.map((s, i) => {
-                      const allDone = s.tasks.every(t => doneMap[`${s.id}:${t.id}`]);
-                      return (
-                        <button
-                          key={s.id}
-                          onClick={() => stageScrollTo(s.id)}
-                          className={cls(
-                            "flex-1 h-2 mx-0.5 rounded-full",
-                            allDone ? "bg-[color:var(--brand-primary)]" : i === currentStageIndex ? "bg-[color:var(--brand-accent)]" : "bg-gray-300"
-                          )}
-                          title={`${s.title}`}
-                        />
-                      );
-                    })}
-                  </div>
-                  <div className="text-xs text-gray-600">Поточний етап: <span className="font-medium">Етап {currentStageIndex + 1}</span></div>
+          <SectionCard title="Фільтри" subtitle="Легка навігація по етапах і задачах">
+            <div className="space-y-4">
+              <div>
+                <div className="text-xs text-gray-500 mb-2">Етап</div>
+                <div className="flex flex-wrap gap-2">
+                  <FilterChip label="Всі" active={stageFilter === "all"} onClick={() => setStageFilter("all")} />
+                  {PLAN.map((s) => (
+                    <FilterChip key={s.id} label={`${s.id}`} active={stageFilter === String(s.id)} onClick={() => setStageFilter(String(s.id))} />
+                  ))}
                 </div>
-              </SectionCard>
-
-              <SectionCard title="Фільтри" subtitle="Легка навігація по етапах і задачах">
-                <div className="space-y-4">
-                  <div>
-                    <div className="text-xs text-gray-500 mb-2">Етап</div>
-                    <div className="flex flex-wrap gap-2">
-                      <FilterChip label="Всі" active={stageFilter === "all"} onClick={() => setStageFilter("all")} />
-                      {PLAN.map(s => (
-                        <FilterChip key={s.id} label={`${s.id}`} active={stageFilter === String(s.id)} onClick={() => setStageFilter(String(s.id))} />
-                      ))}
-                    </div>
-                  </div>
-                  <div>
-                    <div className="text-xs text-gray-500 mb-2">Період</div>
-                    <div className="flex flex-wrap gap-2">
-                      <FilterChip label="Всі" active={periodFilter === "all"} onClick={() => setPeriodFilter("all")} />
-                      <FilterChip label="До Нового року (1–3)" active={periodFilter === "preNY"} onClick={() => setPeriodFilter("preNY")} />
-                      <FilterChip label="Після Нового року (4–6)" active={periodFilter === "postNY"} onClick={() => setPeriodFilter("postNY")} />
-                    </div>
-                  </div>
-                  <div>
-                    <div className="text-xs text-gray-500 mb-2">Роль задачі</div>
-                    <div className="flex flex-wrap gap-2">
-                      {["executor", "client", "both"].map(r => (
-                        <button
-                          key={r}
-                          onClick={() => setRoleFilter(prev => prev.includes(r) ? prev.filter(x => x !== r) : [...prev, r])}
-                          className={cls("px-3 py-1 rounded-full text-xs border", roleFilter.includes(r) ? "bg-white border-[color:var(--brand-primary)]" : "bg-white border-gray-200 text-gray-500")}
-                        >
-                          {r === "executor" ? "Виконавець" : r === "client" ? "Клієнт" : "Разом"}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                  <div>
-                    <div className="text-xs text-gray-500 mb-2">Статус</div>
-                    <div className="flex flex-wrap gap-2">
-                      <FilterChip label="Всі" active={statusFilter === "all"} onClick={() => setStatusFilter("all")} />
-                      <FilterChip label="Виконані" active={statusFilter === "done"} onClick={() => setStatusFilter("done")} />
-                      <FilterChip label="Невиконані" active={statusFilter === "notdone"} onClick={() => setStatusFilter("notdone")} />
-                    </div>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <a href={MAIL} className="text-sm text-[color:var(--brand-primary)] underline">Зв’язатися</a>
-                    <button onClick={resetAll} className="text-xs text-gray-500 hover:text-gray-800">Очистити позначки</button>
-                  </div>
+              </div>
+              <div>
+                <div className="text-xs text-gray-500 mb-2">Період</div>
+                <div className="flex flex-wrap gap-2">
+                  <FilterChip label="Всі" active={periodFilter === "all"} onClick={() => setPeriodFilter("all")} />
+                  <FilterChip label="До Нового року (1–3)" active={periodFilter === "preNY"} onClick={() => setPeriodFilter("preNY")} />
+                  <FilterChip label="Після Нового року (4–6)" active={periodFilter === "postNY"} onClick={() => setPeriodFilter("postNY")} />
                 </div>
-              </SectionCard>
-
-              <SectionCard title="Контакти" subtitle="ABM Cloud · Finance BPM">
-                <div className="space-y-2 text-sm">
-                  <div>Пошта: <a className="text-[color:var(--brand-primary)] underline" href={MAIL}>riae@abmcloud.com</a></div>
-                  <div className="text-gray-500">Для термінових питань — тема листа з префіксом <span className="font-mono">[IR‑FinanceBPM]</span>.</div>
-                  <div className="text-xs text-gray-400">Бренд: Montserrat, Persian Blue, Amaranth, Light Sky Blue.</div>
+              </div>
+              <div>
+                <div className="text-xs text-gray-500 mb-2">Роль задачі</div>
+                <div className="flex flex-wrap gap-2">
+                  {["executor", "client", "both"].map((r) => (
+                    <button
+                      key={r}
+                      onClick={() =>
+                        setRoleFilter((prev) =>
+                          prev.includes(r) ? prev.filter((x) => x !== r) : [...prev, r]
+                        )
+                      }
+                      className={cls(
+                        "px-3 py-1 rounded-full text-xs border",
+                        roleFilter.includes(r) ? "bg-white border-[color:var(--brand-primary)]" : "bg-white border-gray-200 text-gray-500"
+                      )}
+                    >
+                      {r === "executor" ? "Виконавець" : r === "client" ? "Клієнт" : "Разом"}
+                    </button>
+                  ))}
                 </div>
-              </SectionCard>
-            </div>
-          </div>
-
-          {/* Stages */}
-          <div className="max-w-7xl mx-auto px-4 md:px-6 pb-10 space-y-6">
-            {filteredStages.map(stage => {
-              const stageAll = stage.tasks.length;
-              const stageDone = stage.tasks.filter(t => doneMap[`${stage.id}:${t.id}`]).length;
-              const stagePct = Math.round((stageDone / Math.max(1, stageAll)) * 100);
-              return (
-                <div key={stage.id} id={`stage-${stage.id}`} className="scroll-mt-20">
-                  <SectionCard
-                    title={`Етап ${stage.id} · ${stage.title.replace(/^Етап \\d+\\. /, "")}`}
-                    subtitle={`Тривалість: ${stage.duration} · Мета: ${stage.goal}`}
-                    right={<div className="text-right"><div className="text-xs text-gray-500">Прогрес етапу</div><div className="text-sm font-semibold">{stageDone}/{stageAll} ({stagePct}%)</div></div>}
-                  >
-                    <div className="grid md:grid-cols-3 gap-5">
-                      <div className="md:col-span-2">
-                        <h4 className="text-sm font-semibold text-[color:var(--brand-oxford)] mb-2">Завдання</h4>
-                        <div className="divide-y divide-[color:var(--brand-grayLine)] bg-white rounded-xl border border-[color:var(--brand-grayLine)]/80">
-                          {stage.tasks.filter(t => taskOk(stage.id, t)).map(t => (
-                            <div key={t.id} className="px-4 md:px-5">
-                              <TaskRow stageId={stage.id} task={t} doneMap={doneMap} setDoneMap={setDoneMap} />
-                            </div>
-                          ))}
-                          {stage.tasks.filter(t => taskOk(stage.id, t)).length === 0 && (
-                            <div className="p-5 text-sm text-gray-500">Немає задач за обраними фільтрами.</div>
-                          )}
-                        </div>
-                      </div>
-                      <aside>
-                        <h4 className="text-sm font-semibold text-[color:var(--brand-oxford)] mb-2">Результати етапу</h4>
-                        <ul className="space-y-2 text-sm bg-white rounded-xl border border-[color:var(--brand-grayLine)]/80 p-4">
-                          {stage.results.map((r, idx) => (
-                            <li key={idx} className="flex gap-2 items-start">
-                              <span className="mt-1 h-2 w-2 rounded-full" style={{ background: BRAND.primary }}></span>
-                              <span>{r}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </aside>
-                    </div>
-                  </SectionCard>
+              </div>
+              <div>
+                <div className="text-xs text-gray-500 mb-2">Статус</div>
+                <div className="flex flex-wrap gap-2">
+                  <FilterChip label="Всі" active={statusFilter === "all"} onClick={() => setStatusFilter("all")} />
+                  <FilterChip label="Виконані" active={statusFilter === "done"} onClick={() => setStatusFilter("done")} />
+                  <FilterChip label="Невиконані" active={statusFilter === "notdone"} onClick={() => setStatusFilter("notdone")} />
                 </div>
-              );
-            })}
-          </div>
-
-          {/* Footer */}
-          <footer className="border-t border-[color:var(--brand-grayLine)] bg-white">
-            <div className="max-w-7xl mx-auto px-4 md:px-6 py-6 text-sm text-gray-600 flex flex-col md:flex-row items-center justify-between gap-3">
-              <div>© <span id="y"></span> ABM Cloud · Finance BPM · План впровадження ІР</div>
-              <div className="flex items-center gap-2">
-                <a href="#top" className="underline">Вгору</a>
-                <span className="opacity-40">·</span>
-                <a href={MAIL} className="underline">Зв’язатися</a>
+              </div>
+              <div className="flex justify-between items-center">
+                <a href={MAIL} className="text-sm text-[color:var(--brand-primary)] underline">Зв’язатися</a>
+                <button onClick={resetAll} className="text-xs text-gray-500 hover:text-gray-800">Очистити позначки</button>
               </div>
             </div>
-          </footer>
+          </SectionCard>
+
+          <SectionCard title="Контакти" subtitle="ABM Cloud · Finance BPM">
+            <div className="space-y-2 text-sm">
+              <div>Пошта: <a className="text-[color:var(--brand-primary)] underline" href={MAIL}>riae@abmcloud.com</a></div>
+              <div className="text-gray-500">Для термінових питань — надсилайте тему листа з префіксом <span className="font-mono">[IR‑FinanceBPM]</span>.</div>
+              <div className="text-xs text-gray-400">Бренд: Montserrat, Persian Blue, Amaranth, Light Sky Blue.</div>
+            </div>
+          </SectionCard>
         </div>
-      );
-    }
+      </div>
 
-    const root = ReactDOM.createRoot(document.getElementById("root"));
-    root.render(<App />);
-    document.getElementById("y").textContent = new Date().getFullYear();
+      {/* Interaction History */}
+      <div className="max-w-7xl mx-auto px-4 md:px-6 pb-6">
+        <InteractionHistory />
+      </div>
 
-    // --- Optional: endpoints to sync progress via n8n/Notion ---
-    // 1) Create webhook GET /ir-plan-progress → returns JSON { map: { "1:1.1": true, ... } }
-    // 2) Create webhook POST /ir-plan-progress → body { map: {...}, user: "email", project: "IR" }
-    // Then uncomment below and set ENDPOINT to your n8n URL.
-    /*
-    const ENDPOINT = "https://YOUR_N8N_HOST/webhook/ir-plan-progress";
-    async function syncLoad() {
-      try { const r = await fetch(ENDPOINT, { method: "GET" }); const j = await r.json();
-        if (j && j.map) { localStorage.setItem("fbbp_ir_doneMap", JSON.stringify(j.map)); location.reload(); }
-      } catch(e) { console.warn("Sync load failed", e); }
-    }
-    async function syncSave(map) {
-      try { await fetch(ENDPOINT, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ map, user: "someone@company.com", project: "IR" }) }); }
-      catch(e) { console.warn("Sync save failed", e); }
-    }
-    // Example: debounce save on change
-    let _t; new MutationObserver(() => { clearTimeout(_t); _t = setTimeout(() => syncSave(JSON.parse(localStorage.getItem("fbbp_ir_doneMap")||"{}")), 1000); })
-      .observe(document.getElementById("root"), { childList: true, subtree: true });
-    */
-  </script>
-</body>
-</html>
+      {/* Stages */}
+      <div className="max-w-7xl mx-auto px-4 md:px-6 pb-10 space-y-6">
+        {filteredStages.map((stage) => {
+          const stageAll = stage.tasks.length;
+          const stageDone = stage.tasks.filter((t) => doneMap[`${stage.id}:${t.id}`]).length;
+          const stagePct = Math.round((stageDone / Math.max(1, stageAll)) * 100);
+          return (
+            <div key={stage.id} id={`stage-${stage.id}`} className="scroll-mt-20">
+              <SectionCard
+                title={`Етап ${stage.id} · ${stage.title.replace(/^Етап \d+\. /, "")}`}
+                subtitle={`Тривалість: ${stage.duration} · Мета: ${stage.goal}`}
+                right={<div className="text-right"><div className="text-xs text-gray-500">Прогрес етапу</div><div className="text-sm font-semibold">{stageDone}/{stageAll} ({stagePct}%)</div></div>}
+              >
+                <div className="grid md:grid-cols-3 gap-5">
+                  <div className="md:col-span-2">
+                    <h4 className="text-sm font-semibold text-[color:var(--brand-oxford)] mb-2">Завдання</h4>
+                    <div className="divide-y divide-[color:var(--brand-grayLine)] bg-white rounded-xl border border-[color:var(--brand-grayLine)]/80">
+                      {stage.tasks.filter((t) => filterTaskPredicate(stage.id, t)).map((t) => (
+                        <div key={t.id} className="px-4 md:px-5">
+                          <TaskRow stageId={stage.id} task={t} doneMap={doneMap} setDoneMap={setDoneMap} />
+                        </div>
+                      ))}
+                      {stage.tasks.filter((t) => filterTaskPredicate(stage.id, t)).length === 0 && (
+                        <div className="p-5 text-sm text-gray-500">Немає задач за обраними фільтрами.</div>
+                      )}
+                    </div>
+                  </div>
+                  <aside>
+                    <h4 className="text-sm font-semibold text-[color:var(--brand-oxford)] mb-2">Результати етапу</h4>
+                    <ul className="space-y-2 text-sm bg-white rounded-xl border border-[color:var(--brand-grayLine)]/80 p-4">
+                      {stage.results.map((r, idx) => (
+                        <li key={idx} className="flex gap-2 items-start">
+                          <span className="mt-1 h-2 w-2 rounded-full" style={{ background: BRAND.primary }} />
+                          <span>{r}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </aside>
+                </div>
+              </SectionCard>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Footer */}
+      <footer className="border-t border-[color:var(--brand-grayLine)] bg-white">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 py-6 text-sm text-gray-600 flex flex-col md:flex-row items-center justify-between gap-3">
+          <div>
+            © {new Date().getFullYear()} ABM Cloud · Finance BPM · План впровадження ІР
+          </div>
+          <div className="flex items-center gap-2">
+            <a href="#top" className="underline">Вгору</a>
+            <span className="opacity-40">·</span>
+            <a href={MAIL} className="underline">Зв’язатися</a>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+}
