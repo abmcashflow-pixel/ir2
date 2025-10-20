@@ -1,4 +1,36 @@
-<script type="text/babel">
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Finance BPM · План впровадження ІР</title>
+  <meta name="description" content="Лендінг із планом впровадження Finance BPM для Інвестиційного проєкту (ІР): етапи, задачі, прогрес і контакти." />
+  <!-- NOTE: CDN Tailwind + Babel — ок для демо. Для продакшену зберіть Vite/CLI (див. інструкції нижче в коментарях). -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --brand-primary:#392EC9;/* Persian Blue */
+      --brand-accent:#EF0650; /* Amaranth */
+      --brand-sky:#83C8FA;    /* Light Sky Blue */
+      --brand-oxford:#0B132B; /* Oxford Blue */
+      --brand-grayBg:#F5F5FC;
+      --brand-grayLine:#E7E7EA;
+    }
+    body{font-family:Montserrat,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif;}
+    /* Focus ring для клавіатурної навігації */
+    :focus-visible{outline:2px solid var(--brand-primary); outline-offset:2px;}
+  </style>
+</head>
+<body class="min-h-screen bg-[color:var(--brand-grayBg)] text-[color:var(--brand-oxford)]">
+  <div id="root"></div>
+
+  <script type="text/babel">
 /* ========= CONFIG ========= */
 const MAIL = "mailto:riae@abmcloud.com";
 const BRAND = {primary:"#392EC9",accent:"#EF0650",sky:"#83C8FA",oxford:"#0B132B",grayBg:"#F5F5FC",grayLine:"#E7E7EA"};
@@ -396,3 +428,15 @@ const root=ReactDOM.createRoot(document.getElementById("root"));
 root.render(<App/>);
 const _y=document.getElementById("y"); if(_y) _y.textContent=new Date().getFullYear();
 </script>
+
+  <!-- ========================================
+       PROD BUILD HINT (видаліть у фінальній версії)
+       1) npm create vite@latest fbpm-plan -- --template react
+       2) npm i
+       3) npm i -D tailwindcss postcss autoprefixer
+       4) npx tailwindcss init -p
+       5) перенесіть JSX у src/App.jsx, токени в CSS, заберіть @babel/standalone і CDN tailwind
+       6) npm run build && deploy (Netlify/Vercel/Nginx)
+  ======================================== -->
+</body>
+</html>
