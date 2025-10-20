@@ -209,149 +209,50 @@
 
     /* ========================================
        Interaction History (Notion sync via n8n)
-       — fixed histLoad() duplicate & syntax
+       — single, clean version
     ======================================== */
     const HISTORY_TYPES=["зустріч","питання","відповідь","рішення","нотатка"];
 
     function Pill({label,active,onClick}){
-      return <button onClick={onClick} aria-pressed={!!active} className={cls("px-3 py-1 rounded-full text-xs border transition",
-        active?"bg-white border-[color:var(--brand-primary)] text-[color:var(--brand-primary)] shadow":"bg-white border-gray-200 text-gray-600 hover:text-gray-900")}>{label}</button>;
+      return (
+        <button onClick={onClick} aria-pressed={!!active}
+          className={cls("px-3 py-1 rounded-full text-xs border transition",
+            active?"bg-white border-[color:var(--brand-primary)] text-[color:var(--brand-primary)] shadow":"bg-white border-gray-200 text-gray-600 hover:text-gray-900")}>{label}</button>
+      );
     }
 
+    function InteractionHistory(){
+      const [items,setItems]=useLocalList("fbbp_ir_history",[]);
+      const [typeFilter,setTypeFilter]=React.useState("all");
+      const [q,setQ]=React.useState("");
+      const [openForm,setOpenForm]=React.useState(false);
+      const [form,setForm]=React.useState({type:"зустріч",title:"",summary:"",link:""});
 
-     /* ========================================
-   Interaction History (Notion sync via n8n)
-   — fixed addItem() + histSave() braces
-======================================== */
-const HISTORY_TYPES = ["зустріч","питання","відповідь","рішення","нотатка"];
+      const filtered=React.useMemo(()=>{
+        const okType=(x)=>typeFilter==="all"||x.type===typeFilter;
+        const qlc=q.trim().toLowerCase();
+        return items.filter(x=>okType(x)&&(!qlc||(x.title+" "+x.summary).toLowerCase().includes(qlc)))
+          .sort((a,b)=>new Date(b.date)-new Date(a.date));
+      },[items,typeFilter,q]);
 
-function Pill({label,active,onClick}){
-  return (
-    <button onClick={onClick} aria-pressed={!!active}
-      className={cls("px-3 py-1 rounded-full text-xs border transition",
-        active ? "bg-white border-[color:var(--brand-primary)] text-[color:var(--brand-primary)] shadow"
-               : "bg-white border-gray-200 text-gray-600 hover:text-gray-900")}>
-      {label}
-    </button>
-  );
-}
-
-function InteractionHistory(){
-  const [items,setItems] = useLocalList("fbbp_ir_history",[]);
-  const [typeFilter,setTypeFilter] = React.useState("all");
-  const [q,setQ] = React.useState("");
-  const [openForm,setOpenForm] = React.useState(false);
-  const [form,setForm] = React.useState({type:"зустріч",title:"",summary:"",link:""});
-
-  const filtered = React.useMemo(()=>{
-    const okType = (x)=> typeFilter==="all" || x.type===typeFilter;
-    const qlc = q.trim().toLowerCase();
-    return items
-      .filter(x => okType(x) && (!qlc || (x.title+" "+x.summary).toLowerCase().includes(qlc)))
-      .sort((a,b)=> new Date(b.date) - new Date(a.date));
-  },[items,typeFilter,q]);
-
-  function addItem(){
-    if (!form.title.trim() && !form.summary.trim()) return;
-    const it = { id: Date.now().toString(), date: new Date().toISOString(), ...form };
-    setItems(prev => {
-      const next = [it, ...prev];
-      histSave(next);
-      return next;
-    });
-    setForm(f => ({...f, title:"", summary:"", link:""}));
-    setOpenForm(false);
-  }
-
-  function removeItem(id){ setItems(prev => prev.filter(x => x.id !== id)); }
-  function clearAll(){ if (confirm("Очистити всю історію?")) setItems([]); }
-  const fmt = (d)=>{ try{ return new Date(d).toLocaleString("uk-UA"); } catch { return d } };
-
-  /* === n8n / Notion sync === */
-  const HIST_GET_ENDPOINT  = "https://finbpm3.app.n8n.cloud/webhook/6bf259a0-7012-466b-9a35-314fa54daea3";
-  const HIST_POST_ENDPOINT = new URLSearchParams(location.search).get("post")
-    || "https://finbpm3.app.n8n.cloud/webhook/6bf259a0-7012-466b-9a35-314fa54daea3"; // TODO: replace with NEW POST webhook
-
-  async function histLoad(){
-    try{
-      const r = await fetch(HIST_GET_ENDPOINT, { method:"GET" });
-      if(!r.ok) throw new Error(r.status);
-      const raw = await r.text();
-      let j;
-      try { j = JSON.parse(raw); } catch(parseErr){
-        console.warn("Hist load: JSON parse failed", parseErr, raw);
-        return;
+      function addItem(){
+        if(!form.title.trim()&&!form.summary.trim()) return;
+        const it={id:Date.now().toString(),date:new Date().toISOString(),...form};
+        setItems(prev=>{ const next=[it,...prev]; histSave(next); return next; });
+        setForm(f=>({...f,title:"",summary:"",link:""}));
+        setOpenForm(false);
       }
-
-      // Extract list from shapes: {list:[...]}, [{list:[...]}], or [items]
-      let list = [];
-      if (Array.isArray(j)) {
-        if (j.length && Array.isArray(j[0]?.list)) list = j[0].list; else list = j;
-      } else if (j && Array.isArray(j.list)) { list = j.list; }
-
-      const mapType = (t)=>{
-        const s = (t||"").toString().trim().toLowerCase();
-        if(["task","таск","завдання"].includes(s)) return "task";
-        if(["meeting","зустріч"].includes(s)) return "зустріч";
-        if(["decision","рішення"].includes(s)) return "рішення";
-        if(["question","питання"].includes(s)) return "питання";
-        if(["note","нотатка"].includes(s)) return "нотатка";
-        if(["answer","відповідь"].includes(s)) return "відповідь";
-        return "нотатка";
-      };
-
-      // Keep only non-task items
-      list = (list||[]).filter(x => mapType(x?.Type ?? x?.type) !== "task");
-
-      if (Array.isArray(list)){
-        const norm = list.map((x,i)=>({
-          id: String(x.ExtID ?? x.id ?? (Date.now()+"-"+i)),
-          date: x.DateEdit ?? x.date ?? new Date().toISOString(),
-          type: mapType(x.Type ?? x.type),
-          title: x.Name ?? x.title ?? "",
-          summary: x.Description ?? x.summary ?? "",
-          link: x.link ?? ""
-        })).sort((a,b)=> new Date(b.date) - new Date(a.date));
-        try{ localStorage.setItem("fbbp_ir_history", JSON.stringify(norm)); }catch{}
-        setItems(norm);
-      }
-    }catch(e){ console.warn("Hist load GET failed", e); }
-  }
-
-  async function histSave(list){
-    try{
-      await fetch(HIST_POST_ENDPOINT, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ list, project: "IR" })
-      });
-    }catch(e){
-      console.warn("Hist save failed", e);
-    }
-  }
-
-  React.useEffect(()=>{ histLoad(); },[]);
-
-  return (
-    <SectionCard title="Історія взаємодії" subtitle="Саммері зустрічей, питання/відповіді, рішення та нотатки (локальна пам’ять + синк через n8n/Notion)">
-      {/* ...все, що нижче у тебе було, можна залишити без змін... */}
-      {/* (твій рендер-форми, список, кнопки, тощо) */}
-    </SectionCard>
-  );
-}
-
-      function removeItem(id){ setItems(prev=>prev.filter(x=>x.id!==id)) }
-      function clearAll(){ if(confirm("Очистити всю історію?")) setItems([]) }
-      const fmt=(d)=>{ try{ return new Date(d).toLocaleString("uk-UA")}catch{ return d } };
+      function removeItem(id){ setItems(prev=>prev.filter(x=>x.id!==id)); }
+      function clearAll(){ if(confirm("Очистити всю історію?")) setItems([]); }
+      const fmt=(d)=>{ try{ return new Date(d).toLocaleString("uk-UA"); }catch{ return d } };
 
       /* === n8n / Notion sync === */
-      // Webhooks: GET (old) for loading, POST (new) for saving. You can override POST via ?post=<url>
       const HIST_GET_ENDPOINT  = "https://finbpm3.app.n8n.cloud/webhook/6bf259a0-7012-466b-9a35-314fa54daea3";
       const HIST_POST_ENDPOINT = new URLSearchParams(location.search).get('post') || "https://finbpm3.app.n8n.cloud/webhook/6bf259a0-7012-466b-9a35-314fa54daea3"; // TODO: set NEW POST webhook
 
       async function histLoad(){
         try{
-          const r = await fetch(HIST_GET_ENDPOINT, { method: "GET" });
+          const r = await fetch(HIST_GET_ENDPOINT, { method:"GET" });
           if(!r.ok) throw new Error(r.status);
           const raw = await r.text();
           let j; try { j = JSON.parse(raw); } catch(parseErr){ console.warn("Hist load: JSON parse failed", parseErr, raw); return; }
@@ -362,7 +263,6 @@ function InteractionHistory(){
             if (j.length && Array.isArray(j[0]?.list)) list = j[0].list; else list = j;
           } else if (j && Array.isArray(j.list)) { list = j.list; }
 
-          // Map Notion types -> UI types, and filter OUT tasks
           const mapType = (t)=>{
             const s = (t||"").toString().trim().toLowerCase();
             if(["task","таск","завдання"].includes(s)) return "task";
@@ -378,19 +278,22 @@ function InteractionHistory(){
           list = (list||[]).filter(x => mapType(x?.Type ?? x?.type) !== "task");
 
           if (Array.isArray(list)){
-            const norm = list.map((x,i)=>({
-              id: String(x.ExtID ?? x.id ?? (Date.now()+"-"+i)),
-              date: x.DateEdit ?? x.date ?? new Date().toISOString(),
-              type: mapType(x.Type ?? x.type),
-              title: x.Name ?? x.title ?? "",
-              summary: x.Description ?? x.summary ?? "",
-              link: x.link ?? ""
-            })).sort((a,b)=> new Date(b.date) - new Date(a.date));
+            const norm = list.map((x,i)=>(
+              {
+                id: String(x.ExtID ?? x.id ?? (Date.now()+"-"+i)),
+                date: x.DateEdit ?? x.date ?? new Date().toISOString(),
+                type: mapType(x.Type ?? x.type),
+                title: x.Name ?? x.title ?? "",
+                summary: x.Description ?? x.summary ?? "",
+                link: x.link ?? ""
+              }
+            )).sort((a,b)=> new Date(b.date) - new Date(a.date));
             try{ localStorage.setItem("fbbp_ir_history", JSON.stringify(norm)); }catch{}
             setItems(norm);
           }
         }catch(e){ console.warn("Hist load GET failed", e); }
       }
+
       async function histSave(list){
         try {
           await fetch(HIST_POST_ENDPOINT, {
@@ -398,17 +301,10 @@ function InteractionHistory(){
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ list, project: "IR" })
           });
-        } catch (e) {
-          console.warn("Hist save failed", e);
-        }
-      });
         } catch (e) { console.warn("Hist save failed", e); }
-      } catch (e) {
-          console.warn("Hist save failed", e);
-        }
       }
 
-      React.useEffect(()=>{ histLoad() },[]);
+      React.useEffect(()=>{ histLoad(); },[]);
 
       return (
         <SectionCard title="Історія взаємодії" subtitle="Саммері зустрічей, питання/відповіді, рішення та нотатки (локальна пам’ять + синк через n8n/Notion)">
@@ -558,7 +454,9 @@ function InteractionHistory(){
                     <div className="text-xs text-gray-500 mb-2">Етап</div>
                     <div className="flex flex-wrap gap-2">
                       <FilterChip label="Всі" active={stageFilter==="all"} onClick={()=>setStageFilter("all")} />
-                      {PLAN.map(s=><FilterChip key={s.id} label={`${s.id}`} active={stageFilter===String(s.id)} onClick={()=>setStageFilter(String(s.id))} />)}
+                      {PLAN.map(s=>
+                        <FilterChip key={s.id} label={`${s.id}`} active={stageFilter===String(s.id)} onClick={()=>setStageFilter(String(s.id))} />
+                      )}
                     </div>
                   </div>
                   <div>
@@ -572,7 +470,7 @@ function InteractionHistory(){
                   <div>
                     <div className="text-xs text-gray-500 mb-2">Роль задачі</div>
                     <div className="flex flex-wrap gap-2">
-                      {["executor","client","both"].map(r=>(
+                      {["executor","client","both"].map(r=> (
                         <button key={r} onClick={()=>setRoleFilter(p=>p.includes(r)?p.filter(x=>x!==r):[...p,r])}
                           className={cls("px-3 py-1 rounded-full text-xs border",roleFilter.includes(r)?"bg-white border-[color:var(--brand-primary)]":"bg-white border-gray-200 text-gray-500")}>
                           {r==="executor"?"Виконавець":r==="client"?"Клієнт":"Разом"}
