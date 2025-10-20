@@ -1,442 +1,329 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Finance BPM · План впровадження ІР</title>
-  <meta name="description" content="Лендінг із планом впровадження Finance BPM для Інвестиційного проєкту (ІР): етапи, задачі, прогрес і контакти." />
-  <!-- NOTE: CDN Tailwind + Babel — ок для демо. Для продакшену зберіть Vite/CLI (див. інструкції нижче в коментарях). -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-  <script crossorigin src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <title>FBPM · Панель-корабель проєкту (з Планом ІР)</title>
+  <meta name="description" content="Об'єднаний клієнтський дешборд для впровадження FBPM: Health, майлстони, зустрічі, документи, задачі, та повний План впровадження ІР зі стадіями і ролями."/>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root{
-      --brand-primary:#392EC9;/* Persian Blue */
-      --brand-accent:#EF0650; /* Amaranth */
-      --brand-sky:#83C8FA;    /* Light Sky Blue */
-      --brand-oxford:#0B132B; /* Oxford Blue */
-      --brand-grayBg:#F5F5FC;
-      --brand-grayLine:#E7E7EA;
+      --brand-primary:#392EC9; /* Persian Blue */
+      --brand-accent:#EF0650;  /* Amaranth */
+      --brand-sky:#83C8FA;     /* Light Sky Blue */
+      --brand-oxford:#0B132B;  /* Oxford Blue */
+      --brand-bg:#F5F5FC;      /* Soft Gray */
+      --brand-line:#E7E7EA;    /* Lines */
+      --ok:#27AE60;            /* Success */
+      --risk:#F2C94C;          /* Warning */
+      --block:#EB5757;         /* Error */
+      --panel:#FFFFFF; --muted:#6B7280; --shadow:0 10px 25px rgba(11,19,43,.08); --radius:18px;
     }
-    body{font-family:Montserrat,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif;}
-    /* Focus ring для клавіатурної навігації */
-    :focus-visible{outline:2px solid var(--brand-primary); outline-offset:2px;}
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;font-family:Montserrat,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--brand-oxford);background:linear-gradient(180deg,#EBEAFA 0%, var(--brand-bg) 100%);} 
+    a{color:var(--brand-primary);text-decoration:none}
+    a:hover{text-decoration:underline}
+    .wrap{max-width:1200px;margin:32px auto;padding:0 16px}
+    .grid{display:grid;gap:16px}
+    .row{display:flex;gap:16px;flex-wrap:wrap}
+    .panel{background:var(--panel);border:1px solid var(--brand-line);border-radius:var(--radius);box-shadow:var(--shadow);} .panel.pad{padding:20px}
+    .title{font-weight:700;letter-spacing:.2px}
+    .muted{color:var(--muted)}
+    .chip{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--brand-line);padding:8px 12px;border-radius:999px;background:#fff;cursor:pointer;user-select:none}
+    .chip.active{border-color:var(--brand-primary);box-shadow:0 0 0 3px rgba(57,46,201,.08)}
+    .btn{display:inline-flex;align-items:center;justify-content:center;padding:10px 14px;border-radius:12px;border:1px solid var(--brand-line);background:#fff;cursor:pointer;transition:transform .05s ease, box-shadow .15s ease}
+    .btn:hover{box-shadow:0 6px 16px rgba(11,19,43,.08)}
+    .btn.primary{background:linear-gradient(90deg,var(--brand-primary), var(--brand-accent));color:#fff;border-color:transparent}
+    .btn.ghost{background:#fff}
+    .btn:active{transform:translateY(1px)}
+    .btn:focus-visible{outline:3px solid var(--brand-primary);outline-offset:2px}
+    .hero{padding:22px}
+    .hero .title{font-size:26px}
+    .hero .sub{display:flex;gap:12px;flex-wrap:wrap;margin-top:6px}
+    .health{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+    .pill{display:inline-flex;gap:8px;align-items:center;padding:8px 12px;border-radius:999px;border:1px solid var(--brand-line);background:#fff}
+    .dot{width:10px;height:10px;border-radius:50%}
+    .dot.g{background:var(--ok)} .dot.y{background:var(--risk)} .dot.r{background:var(--block)}
+    .kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+    .kpi{padding:16px;border-radius:16px;border:1px solid var(--brand-line);background:#fff;box-shadow:var(--shadow)}
+    .kpi h4{margin:0 0 6px;font-size:13px;font-weight:600;color:var(--muted)}
+    .kpi .v{font-size:24px;font-weight:700}
+    .kpi .hint{font-size:12px;color:var(--muted)}
+    .cols{display:grid;grid-template-columns:2fr 1.2fr;gap:16px}
+    .timeline{position:relative;padding:8px 8px 12px 8px}
+    .timeline .rail{height:4px;background:#D7D5F4;border-radius:999px;margin:24px 0}
+    .timeline .marks{display:flex;gap:18px;overflow:auto;padding-bottom:6px}
+    .mark{min-width:220px;background:#fff;border:1px solid var(--brand-line);border-radius:12px;padding:12px;box-shadow:var(--shadow)}
+    .mark .when{font-size:12px;color:var(--muted)} .mark .name{font-weight:600;margin-top:4px}
+    .mark.done{border-color:#C4C0EF} .mark.now{border-color:var(--brand-accent)} .mark.next{border-color:var(--brand-primary)}
+    .list{display:grid;gap:8px}
+    .item{padding:12px;border:1px solid var(--brand-line);border-radius:12px;background:#fff}
+    .table{width:100%;border-collapse:separate;border-spacing:0 8px}
+    .table th{font-size:12px;font-weight:600;color:var(--muted);text-align:left;padding:0 12px}
+    .table td{background:#fff;border:1px solid var(--brand-line);border-left:none;border-right:none;padding:12px}
+    .table tr td:first-child{border-radius:12px 0 0 12px;border-left:1px solid var(--brand-line)}
+    .table tr td:last-child{border-radius:0 12px 12px 0;border-right:1px solid var(--brand-line)}
+    .cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+    .card{padding:14px;border:1px solid var(--brand-line);border-radius:14px;background:#fff;box-shadow:var(--shadow)}
+    .filters{display:flex;gap:8px;flex-wrap:wrap}
+    .footer{margin:24px 0 48px;color:var(--muted);font-size:12px;text-align:center}
+    .stage{background:#fff;border:1px solid var(--brand-line);border-radius:16px;padding:16px;box-shadow:var(--shadow);margin-bottom:12px}
+    .badge{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;border:1px solid var(--brand-line)}
+    .role-ex{background:rgba(57,46,201,.08);border-color:var(--brand-primary);color:var(--brand-primary)}
+    .role-cl{background:rgba(239,6,80,.1);border-color:var(--brand-accent);color:var(--brand-accent)}
+    .role-bo{background:rgba(131,200,250,.2);border-color:var(--brand-sky);color:var(--brand-oxford)}
+    .task{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-top:1px dashed var(--brand-line)} .task:first-child{border-top:none}
+    @media (max-width: 980px){ .kpis{grid-template-columns:repeat(2,1fr)} .cols{grid-template-columns:1fr} .cards{grid-template-columns:1fr} }
   </style>
 </head>
-<body class="min-h-screen bg-[color:var(--brand-grayBg)] text-[color:var(--brand-oxford)]">
-  <div id="root"></div>
-
-  <script type="text/babel">
-/* ========= CONFIG ========= */
-const MAIL = "mailto:riae@abmcloud.com";
-const BRAND = {primary:"#392EC9",accent:"#EF0650",sky:"#83C8FA",oxford:"#0B132B",grayBg:"#F5F5FC",grayLine:"#E7E7EA"};
-const HIST_GET_ENDPOINT  = "https://finbpm3.app.n8n.cloud/webhook/6bf259a0-7012-466b-9a35-314fa54daea3";
-const HIST_POST_ENDPOINT = new URLSearchParams(location.search).get("post") || "https://finbpm3.app.n8n.cloud/webhook/6bf259a0-7012-466b-9a35-314fa54daea3";
-
-/* ========= helpers ========= */
-const cls=(...xs)=>xs.filter(Boolean).join(" ");
-function useLocalMap(key, initial){const [v,sv]=React.useState(()=>{try{const r=localStorage.getItem(key);return r?JSON.parse(r):initial}catch{return initial}});React.useEffect(()=>{try{localStorage.setItem(key,JSON.stringify(v))}catch{}},[key,v]);return [v,sv];}
-function useLocalList(key, initial){const [v,sv]=React.useState(()=>{try{const r=localStorage.getItem(key);return r?JSON.parse(r):initial}catch{return initial}});React.useEffect(()=>{try{localStorage.setItem(key,JSON.stringify(v))}catch{}},[key,v]);return [v,sv];}
-
-const HISTORY_TYPES = ["зустріч","питання","відповідь","рішення","нотатка"]; // все, що НЕ Task
-const ROLE_CLASSES = (r)=>r==="executor"?"bg-[color:var(--brand-primary)]/8 border-[color:var(--brand-primary)] text-[color:var(--brand-primary)]"
-  : r==="client"?"bg-[color:var(--brand-accent)]/10 border-[color:var(--brand-accent)] text-[color:var(--brand-accent)]"
-  : "bg-[color:var(--brand-sky)]/20 border-[color:var(--brand-sky)] text-[color:var(--brand-oxford)]";
-
-/* ========= Notion I/O ========= */
-function normalizeRow(x,i){
-  const S=v=>v==null?"":String(v);
-  return {
-    id: S(x.id ?? (Date.now()+"-"+i)),
-    ExtID: S(x.ExtID ?? x.extid ?? ""),
-    Name: S(x.Name ?? x.title ?? ""),
-    DateEdit: S(x.DateEdit ?? x.date ?? new Date().toISOString()),
-    Type: S(x.Type ?? x.type ?? "нотатка"),
-    Status: S(x.Status ?? x.status ?? ""),
-    Description: S(x.Description ?? x.summary ?? ""),
-    link: S(x.link ?? "")
-  };
-}
-async function notionFetchAll(){
-  try{
-    const r=await fetch(HIST_GET_ENDPOINT,{method:"GET"});
-    if(!r.ok) throw new Error(r.status);
-    const raw=await r.text();
-    let j; try{ j=JSON.parse(raw); }catch{ return []; }
-    let list=[];
-    if(Array.isArray(j)){ list = (j.length && Array.isArray(j[0]?.list)) ? j[0].list : j; }
-    else if(j?.list){ list=j.list; }
-    return (list||[]).map(normalizeRow);
-  }catch(e){ console.warn("fetch fail",e); return []; }
-}
-async function notionSaveAll(list){
-  try{
-    await fetch(HIST_POST_ENDPOINT,{
-      method:"POST",
-      headers:{ "Content-Type":"application/json" },
-      body:JSON.stringify({ list, project:"IR" })
-    });
-  }catch(e){ console.warn("save fail",e); }
-}
-function stageFromExtID(ext){ const n=parseInt(String(ext).split(".")[0],10); return Number.isFinite(n)?n:null; }
-
-/* ========= UI bits ========= */
-function StagePill({label,active,onClick}){return(<button aria-pressed={!!active} onClick={onClick}
-  className={cls("px-3 py-1 rounded-full text-sm border transition",active?"bg-white border-[color:var(--brand-primary)] text-[color:var(--brand-primary)] shadow":"bg-white/70 border-gray-200 text-gray-600 hover:text-gray-900")}>{label}</button>);}
-function FilterChip({label,active,onClick}){return(<button aria-pressed={!!active} onClick={onClick}
-  className={cls("px-3 py-1 rounded-full text-xs border",active?"bg-[color:var(--brand-sky)]/20 border-[color:var(--brand-sky)]":"bg-white border-gray-200")}>{label}</button>);}
-function ProgressBar({value}){return(<div className="w-full h-3 bg-gray-200 rounded-full overflow-hidden" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.min(100,Math.max(0,value))}>
-  <div className="h-full rounded-full" style={{width:Math.min(100,Math.max(0,value))+"%",background:`linear-gradient(90deg, ${BRAND.primary}, ${BRAND.accent})`}}/></div>);}
-function SectionCard({title,subtitle,children,right}){return(<section className="bg-white shadow-sm rounded-2xl border border-gray-100 p-5 md:p-6">
-  <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mb-4"><div className="flex-1">
-    <h3 className="text-xl font-semibold text-[color:var(--brand-oxford)]">{title}</h3>{subtitle && <p className="text-sm text-gray-500">{subtitle}</p>}</div>{right}</div>{children}
-</section>);}
-
-/* ========= TASK ROW (works with Notion rows) ========= */
-function TaskRow({stageId,task,doneMap,setDoneMap}){
-  const role=(task.Role||task.role||"both").toLowerCase();
-  const key=`${stageId}:${task.id}`;
-  const done=!!doneMap[key];
-  return (
-    <label className="flex items-start gap-3 py-2 group cursor-pointer">
-      <input type="checkbox" checked={done} onChange={e=>setDoneMap(m=>({...m,[key]:e.target.checked}))}
-        className="mt-1 h-4 w-4 rounded border-gray-300 text-[color:var(--brand-primary)] focus:ring-[color:var(--brand-primary)]"/>
-      <div className={cls("flex-1 text-sm leading-relaxed",done?"line-through text-gray-400":"text-gray-800")}>
-        {task.Name || task.text}
-        {task.Status && <span className="ml-2 text-xs text-gray-500">· {task.Status}</span>}
-      </div>
-      <span className={cls("text-[10px] uppercase tracking-wide px-2 py-1 rounded-full border", ROLE_CLASSES(role))}
-        title={role==="executor"?"Задача виконавця":role==="client"?"Задача клієнта":"Спільна задача"}>
-        {role==="executor"?"виконавець":role==="client"?"клієнт":"разом"}
-      </span>
-    </label>
-  );
-}
-
-/* ========= Interaction History (non-Task) ========= */
-function Pill({label,active,onClick}){return(<button onClick={onClick} aria-pressed={!!active}
-  className={cls("px-3 py-1 rounded-full text-xs border transition",active?"bg-white border-[color:var(--brand-primary)] text-[color:var(--brand-primary)] shadow":"bg-white border-gray-200 text-gray-600 hover:text-gray-900")}>{label}</button>);}
-
-function InteractionHistory({all,setAll}){
-  const [typeFilter,setTypeFilter]=React.useState("all");
-  const [q,setQ]=React.useState(""); const [openForm,setOpenForm]=React.useState(false);
-  const [form,setForm]=React.useState({Type:"зустріч",Name:"",Description:"",link:"",Status:""});
-
-  const historyItems=React.useMemo(()=> all.filter(x=> (x.Type||"").toLowerCase()!=="task"), [all]);
-
-  const filtered=React.useMemo(()=>{
-    const okType=(x)=>typeFilter==="all"||x.Type===typeFilter;
-    const qlc=q.trim().toLowerCase();
-    return historyItems.filter(x=>okType(x)&&(!qlc||(x.Name+" "+x.Description).toLowerCase().includes(qlc)))
-      .sort((a,b)=>new Date(b.DateEdit)-new Date(a.DateEdit));
-  },[historyItems,typeFilter,q]);
-
-  async function addItem(){
-    if(!form.Name.trim() && !form.Description.trim()) return;
-    const item={
-      id: Date.now().toString(),
-      ExtID: "", // не таск
-      Name: form.Name || "",
-      DateEdit: new Date().toISOString(),
-      Type: form.Type,
-      Status: form.Status || "",
-      Description: form.Description || "",
-      link: form.link || ""
-    };
-    const next=[item, ...all];
-    setAll(next);
-    await notionSaveAll(next);
-    setForm({Type:"зустріч",Name:"",Description:"",link:"",Status:""});
-    setOpenForm(false);
-  }
-  function removeItem(id){ const next=all.filter(x=>x.id!==id); setAll(next); notionSaveAll(next); }
-  const fmt=(d)=>{ try{ return new Date(d).toLocaleString("uk-UA"); }catch{ return d } };
-
-  return (
-    <SectionCard title="Історія взаємодії" subtitle="Саммері зустрічей, питання/відповіді, рішення та нотатки (без Task)">
-      <div className="space-y-4">
-        <div className="flex flex-wrap items-center gap-2">
-          <Pill label="Всі" active={typeFilter==="all"} onClick={()=>setTypeFilter("all")} />
-          {HISTORY_TYPES.map(t=><Pill key={t} label={t} active={typeFilter===t} onClick={()=>setTypeFilter(t)} />)}
-          <div className="flex-1" />
-          <input value={q} onChange={e=>setQ(e.target.value)} placeholder="Пошук по історії…" className="w-full md:w-64 px-3 py-2 text-sm border rounded-md" />
-          <button onClick={()=>setOpenForm(v=>!v)} className="px-3 py-2 text-sm rounded-md border border-[color:var(--brand-primary)] text-[color:var(--brand-primary)] hover:bg-[color:var(--brand-primary)] hover:text-white">
-            {openForm?"Сховати форму":"Додати запис"}
-          </button>
-        </div>
-
-        {openForm && (
-          <div className="grid md:grid-cols-4 gap-3 bg-white rounded-xl border border-[color:var(--brand-grayLine)] p-4">
-            <div>
-              <div className="text-xs text-gray-500 mb-1">Тип</div>
-              <select value={form.Type} onChange={e=>setForm({...form,Type:e.target.value})} className="w-full px-3 py-2 text-sm border rounded-md">
-                {HISTORY_TYPES.map(t=><option key={t} value={t}>{t}</option>)}
-              </select>
-            </div>
-            <div className="md:col-span-3">
-              <div className="text-xs text-gray-500 mb-1">Заголовок</div>
-              <input value={form.Name} onChange={e=>setForm({...form,Name:e.target.value})} className="w-full px-3 py-2 text-sm border rounded-md" placeholder="Напр. Саммері дзвінка з CFO"/>
-            </div>
-            <div className="md:col-span-3">
-              <div className="text-xs text-gray-500 mb-1">Короткий зміст</div>
-              <textarea value={form.Description} onChange={e=>setForm({...form,Description:e.target.value})} className="w-full px-3 py-2 text-sm border rounded-md" rows="3" placeholder="Основні тези, рішення, Q&A…"></textarea>
-            </div>
-            <div>
-              <div className="text-xs text-gray-500 mb-1">Посилання (опц.)</div>
-              <input value={form.link} onChange={e=>setForm({...form,link:e.target.value})} className="w-full px-3 py-2 text-sm border rounded-md" placeholder="Notion / Meet / Doc"/>
-            </div>
-            <div className="md:col-span-4 flex justify-end gap-2">
-              <button onClick={addItem} className="px-3 py-2 text-sm rounded-md bg-[color:var(--brand-primary)] text-white">Зберегти</button>
-              <button onClick={()=>setOpenForm(false)} className="px-3 py-2 text-sm rounded-md border">Скасувати</button>
-            </div>
+<body>
+  <main class="wrap grid">
+    <section class="panel hero" aria-labelledby="hero-title">
+      <div class="row" style="justify-content:space-between;align-items:center">
+        <div>
+          <div id="hero-title" class="title">Проєкт: FBPM · Впровадження для ІР</div>
+          <div class="sub">
+            <span class="chip">Фаза: <strong id="phase">—</strong></span>
+            <span class="chip">Завершено: <strong id="pct">—</strong></span>
+            <span class="chip">Наступний крок: <strong id="nextM">—</strong></span>
+            <span class="chip">D-days: <strong id="ddays">—</strong></span>
           </div>
-        )}
-
-        <div className="space-y-3">
-          {filtered.length===0 && <div className="text-sm text-gray-500 border border-dashed rounded-xl p-4">Поки порожньо.</div>}
-          {filtered.map(it=>(
-            <div key={it.id} className="bg-white rounded-xl border border-[color:var(--brand-grayLine)] p-4">
-              <div className="flex items-center gap-2 text-xs text-gray-500">
-                <span className="px-2 py-0.5 rounded-full border">{it.Type}</span>
-                <span>·</span><span>{fmt(it.DateEdit)}</span>
-                <div className="flex-1" />
-                <button onClick={()=>removeItem(it.id)} className="text-xs text-gray-400 hover:text-red-600">Видалити</button>
-              </div>
-              {it.Name && <div className="mt-1 text-sm font-semibold">{it.Name}</div>}
-              {it.Description && <div className="mt-1 text-sm text-gray-700 whitespace-pre-wrap">{it.Description}</div>}
-              {it.link && <a href={it.link} target="_blank" rel="noopener noreferrer" className="mt-2 inline-block text-sm text-[color:var(--brand-primary)] underline">Перейти до джерела</a>}
-            </div>
-          ))}
+          <div class="health" role="status" aria-live="polite">
+            <span class="pill"><span class="dot g" id="scopeDot" aria-hidden="true"></span> Scope</span>
+            <span class="pill"><span class="dot y" id="schedDot" aria-hidden="true"></span> Schedule</span>
+            <span class="pill"><span class="dot g" id="budgetDot" aria-hidden="true"></span> Budget</span>
+          </div>
+        </div>
+        <div class="row" style="gap:8px">
+          <button class="btn ghost" id="btnFilters" type="button">Фільтри</button>
+          <a class="btn primary" id="askPM" href="#">Поставити питання PM</a>
         </div>
       </div>
-    </SectionCard>
-  );
-}
+      <div class="row" style="margin-top:10px">
+        <div class="chip" id="need1">—</div>
+        <div class="chip" id="need2">—</div>
+        <div class="chip" id="need3">—</div>
+      </div>
+    </section>
 
-/* ========= stages meta (без tasks) ========= */
-const STAGES=[
-  {id:1, title:"Етап 1. Оновлення ТЗ, підготовка та розгортання", duration:"2–3 тижні", period:"preNY",
-   goal:"Узгодити PRD v2.0, розгорнути систему на сервері, організувати аналітику та план реалізації.",
-   results:["PRD v2.0 та Project Plan v1.0","Тестова інстанція Finance BPM (сервер, БД, доступи)","Узгоджена структура архіву","Запущений Notion AI Hub","Демо-сценарій PO–Invoice–Act"]},
-  {id:2, title:"Етап 2. Документи, довідники та користувачі", duration:"2–3 тижні", period:"preNY",
-   goal:"Створити модель даних…",
-   results:["Типи документів (PO, Invoice, Act)","Довідники та контролі","Шаблони друку, первинні звіти","Користувачі/ролі/доступи","Архівні дані у системі"]},
-  {id:3, title:"Етап 3. Бізнес-процеси", duration:"2 тижні", period:"preNY",
-   goal:"Налаштувати погодження…",
-   results:["Робочі погодження для PO/Invoice/Act","Форми задач/виконавці","Business Process Overview v1.0"]},
-  {id:4, title:"Етап 4. Реєстри та інтеграції з SAP", duration:"2 тижні", period:"postNY",
-   goal:"Забезпечити реєстри документів і обміни з SAP…",
-   results:["Реєстри погоджених документів","Інтеграції з SAP налаштовано","Протокол інтеграційних тестів"]},
-  {id:5, title:"Етап 5. Тестування та запуск", duration:"2–3 тижні", period:"postNY",
-   goal:"Пройти UAT…",
-   results:["Система пройшла тестування","Користувачі готові","Акт приймання-передачі","Система в дослідній експлуатації"]},
-  {id:6, title:"Етап 6. Післяпроєктна підтримка та розвиток", duration:"постійно", period:"postNY",
-   goal:"Моніторинг, оновлення модулів…",
-   results:["Стабільна робота системи","AI Hub / дайджести","Задокументована історія змін"]},
-];
+    <section class="kpis" aria-label="KPI">
+      <div class="kpi"><h4>Задач виконано</h4><div class="v" id="k_done">—</div><div class="hint" id="k_done_hint">усього / демо</div></div>
+      <div class="kpi"><h4>Просрочені</h4><div class="v" id="k_over">—</div><div class="hint">активні блокери</div></div>
+      <div class="kpi"><h4>В очікуванні</h4><div class="v" id="k_dec">—</div><div class="hint">тип: waiting/pending</div></div>
+      <div class="kpi"><h4>Готовність модулів</h4><div class="v" id="k_mod">—</div><div class="hint">за виконанням задач</div></div>
+    </section>
 
-/* ========= App ========= */
-function App(){
-  const [all,setAll]=React.useState([]);            // ВСІ рядки з Notion
-  const [doneMap,setDoneMap]=useLocalMap("fbbp_ir_doneMap",{});
-  const [stageFilter,setStageFilter]=React.useState("all");
-  const [periodFilter,setPeriodFilter]=React.useState("all");
-  const [statusFilter,setStatusFilter]=React.useState("all");
-  const [roleFilter,setRoleFilter]=React.useState(["executor","client","both"]);
+    <section class="cols">
+      <div class="panel pad" aria-labelledby="ms-title">
+        <div class="row" style="justify-content:space-between;align-items:center"><div id="ms-title" class="title">Майлстони</div><div class="muted">Burn‑up, послідовність і Gantt</div></div>
+        <div class="timeline">
+          <div class="rail" aria-hidden="true"></div>
+          <div class="marks" id="marks"></div>
+        </div>
+      </div>
 
-  // load Notion
-  React.useEffect(()=>{ (async()=>{ setAll(await notionFetchAll()); })(); },[]);
+      <div class="panel pad">
+        <div class="title">Що змінилося за тиждень</div>
+        <ul class="list" id="diff"></ul>
+        <div style="margin-top:8px" class="filters" id="filters"></div>
+      </div>
+    </section>
 
-  // tasks from Notion
-  const tasks=React.useMemo(()=> all.filter(x => (x.Type||"").toLowerCase()==="task"), [all]);
-  const tasksByStage=React.useMemo(()=>{
-    const m=new Map();
-    tasks.forEach(t=>{ const st=stageFromExtID(t.ExtID); if(!st) return; if(!m.has(st)) m.set(st,[]); m.get(st).push(t); });
-    // sort by ExtID numeric
-    for(const [k,arr] of m){ arr.sort((a,b)=> (a.ExtID||"").localeCompare(b.ExtID||"",undefined,{numeric:true})); }
-    return m;
-  },[tasks]);
+    <section class="cols">
+      <div class="panel pad">
+        <div class="row" style="justify-content:space-between;align-items:center"><div class="title">Історія взаємодії (зустрічі/питання/рішення)</div>
+          <input id="searchTag" class="chip" placeholder="#UAT / #Budget / #OCR" style="border:none;outline:none" />
+        </div>
+        <table class="table" style="margin-top:10px">
+          <thead><tr><th>Дата</th><th>Тип</th><th>Заголовок</th><th>Коротко</th><th>Лінк</th></tr></thead>
+          <tbody id="histBody"></tbody>
+        </table>
+        <div class="row" style="margin-top:10px;gap:8px">
+          <input id="histTitle" class="chip" placeholder="Заголовок…" style="border:none;outline:none" />
+          <input id="histSummary" class="chip" placeholder="Короткий зміст…" style="border:none;outline:none;flex:1" />
+          <select id="histType" class="chip" style="border:none;outline:none">
+            <option>зустріч</option><option>питання</option><option>відповідь</option><option>рішення</option><option>нотатка</option>
+          </select>
+          <input id="histLink" class="chip" placeholder="Посилання (опц.)" style="border:none;outline:none" />
+          <button class="btn" id="histAdd" type="button">Додати</button>
+        </div>
+      </div>
 
-  const filteredStages=STAGES.filter(s=>{
-    const byStage=stageFilter==="all"||s.id===Number(stageFilter);
-    const byPeriod=periodFilter==="all"||s.period===periodFilter;
-    return byStage&&byPeriod;
-  });
+      <div class="panel pad">
+        <div class="row" style="justify-content:space-between;align-items:center"><div class="title">Документи</div>
+          <div class="filters"><span class="chip" data-docf="Approved">Approved</span><span class="chip" data-docf="Draft">Draft</span><span class="chip chip-doc-all active" data-docf="">Всі</span></div>
+        </div>
+        <div class="cards" id="docs"></div>
+      </div>
+    </section>
 
-  const flatTasks=React.useMemo(()=> Array.from(tasksByStage.values()).flat(), [tasksByStage]);
-  const totalTasks=flatTasks.length;
-  const doneCount=flatTasks.reduce((a,t)=> doneMap[`${stageFromExtID(t.ExtID)}:${t.id}`]?a+1:a,0);
-  const progress=Math.round((doneCount/Math.max(1,totalTasks))*100);
+    <section class="panel pad">
+      <div class="row" style="justify-content:space-between;align-items:center"><div class="title">План впровадження ІР</div>
+        <div class="filters">
+          <span class="chip active" data-sf="all">Всі етапи</span>
+          <span class="chip" data-sf="preNY">До НР (1–3)</span>
+          <span class="chip" data-sf="postNY">Після НР (4–6)</span>
+          <span class="chip active" data-rf="executor">Виконавець</span>
+          <span class="chip active" data-rf="client">Клієнт</span>
+          <span class="chip active" data-rf="both">Разом</span>
+        </div>
+      </div>
+      <div id="planWrap"></div>
+    </section>
 
-  const currentStageIndex=React.useMemo(()=>{
-    for(let i=0;i<STAGES.length;i++){
-      const list=tasksByStage.get(STAGES[i].id)||[];
-      const allDone=list.length>0 && list.every(t=>doneMap[`${STAGES[i].id}:${t.id}`]);
-      if(!allDone) return i;
+    <section class="panel pad">
+      <div class="row" style="justify-content:space-between;align-items:center"><div class="title">Задачі / Інциденти</div>
+        <div class="filters">
+          <span class="chip" data-f="phase:Пілот">Фаза: Пілот</span>
+          <span class="chip" data-f="mod:PO">PO</span>
+          <span class="chip" data-f="mod:Integrations">Integrations</span>
+          <span class="chip" data-f="owner:PM">PM</span>
+          <span class="chip chip-task-all active" data-f="all:all">Всі</span>
+        </div>
+      </div>
+      <table class="table" style="margin-top:10px">
+        <thead><tr><th>Назва</th><th>Пріоритет</th><th>Відповідальний</th><th>ETA</th><th>Статус</th></tr></thead>
+        <tbody id="taskBody"></tbody>
+      </table>
+    </section>
+
+    <div class="footer">ABM Cloud · FBPM Dashboard + План ІР · Версія 0.4 · Статичний HTML/JS · Шрифти Montserrat · Кольори бренду</div>
+  </main>
+
+  <script>
+    const MAIL = 'mailto:riae@abmcloud.com'
+    const HIST_GET_ENDPOINT  = 'https://finbpm3.app.n8n.cloud/webhook/6bf259a0-7012-466b-9a35-314fa54daea3'
+    const HIST_POST_ENDPOINT = 'https://finbpm3.app.n8n.cloud/webhook/6bf259a0-7012-466b-9a35-314fa54daea3'
+
+    const PLAN = [
+      { id:1, title:'Етап 1. Оновлення ТЗ, підготовка та розгортання', duration:'2–3 тижні', goal:'Узгодити PRD v2.0, розгорнути систему на сервері, організувати аналітику та план реалізації.', period:'preNY', results:['PRD v2.0 та Project Plan v1.0','Тестова інстанція Finance BPM (сервер, БД, доступи)','Узгоджена структура архіву','Запущений Notion AI Hub','Демо-сценарій PO–Invoice–Act'], tasks:[{id:'1.1',text:'3–4 зустрічі для ревізії ТЗ → PRD v2.0 (Implementation Plan)',role:'both'},{id:'1.2',text:'Оновити терміни/логіку процесів (PO, Invoice, Act, архів, погодження)',role:'executor'},{id:'1.3',text:'Узгодити ролі, учасників і канали комунікацій',role:'both'},{id:'1.4',text:'Розгортання: платформа, БД, SMTP/SFTP/API, ролі, логи, бекапи',role:'executor'},{id:'1.5',text:'Аналіз процесів ІР: закупівлі, документообіг, погодження',role:'executor'},{id:'1.6',text:'Сесії з фінансами/закупівлями/бухгалтерією → as-is/to-be',role:'both'},{id:'1.7',text:'Структура архіву: тип документа, метадані, доступи',role:'executor'},{id:'1.8',text:'Підготувати PRD структуру та Project Plan у Notion',role:'executor'},{id:'1.9',text:'Погодити Project Plan v1.0 та демо PO–Invoice–Act',role:'both'},{id:'1.10',text:'Approval meeting результатів етапу',role:'client'}]},
+      { id:2, title:'Етап 2. Документи, довідники та користувачі', duration:'2–3 тижні', goal:'Створити модель даних: типи документів, довідники, контролі, звіти, користувачі та шаблони друку.', period:'preNY', results:['Типи документів (PO, Invoice, Act)','Довідники та контролі','Шаблони друку, первинні звіти','Користувачі/ролі/доступи','Архівні дані у системі'], tasks:[{id:'2.1',text:'Створити PO, Invoice, Act (типи документів)',role:'executor'},{id:'2.2',text:'Налаштувати довідники: контрагенти, договори, підрозділи, валюти, статті',role:'executor'},{id:'2.3',text:'Контролі: унікальність, узгодження сум/статусів, обов’язкові поля',role:'executor'},{id:'2.4',text:'Звіти: Баланс по PO; Баланс по постачальнику',role:'executor'},{id:'2.5',text:'Шаблони друку (PDF/XLSX) ↔ узгодження макетів',role:'both'},{id:'2.6',text:'Імпорт користувачів (Excel/AD), ролі Viewer/Editor/Approver/Admin',role:'executor'},{id:'2.7',text:'Перевірка доступів та імпорт архіва до модуля “Архів”',role:'both'}]},
+      { id:3, title:'Етап 3. Бізнес-процеси', duration:'2 тижні', goal:'Налаштувати погодження документів, ролі/доступи за статусами, нотифікації та провести UAT процесів.', period:'preNY', results:['Робочі погодження для PO/Invoice/Act','Форми задач/виконавці','Business Process Overview v1.0'], tasks:[{id:'3.1',text:'Побудувати маршрути погоджень PO/Invoice/Act',role:'executor'},{id:'3.2',text:'Стани, правила переходів, виконавці',role:'executor'},{id:'3.3',text:'Доступи/ролі залежно від статусу',role:'executor'},{id:'3.4',text:'Автоповідомлення авторам про “незакриті” документи',role:'executor'},{id:'3.5',text:'UAT погоджень з ключовими користувачами',role:'both'},{id:'3.6',text:'За потреби спростити UX (короткі маршрути / групові рішення)',role:'executor'}]},
+      { id:4, title:'Етап 4. Реєстри та інтеграції з SAP', duration:'2 тижні', goal:'Забезпечити реєстри документів і обміни з SAP (SFTP/API) з моніторингом і логуванням.', period:'postNY', results:['Реєстри погоджених документів','Інтеграції з SAP налаштовано','Протокол інтеграційних тестів'], tasks:[{id:'4.1',text:'Реєстри Invoice/Act з фільтрами, пошуком, масовими діями',role:'executor'},{id:'4.2',text:'SAP: імпорт контрагентів, експорт погоджених документів (SFTP/API)',role:'executor'},{id:'4.3',text:'Моніторинг/логування обмінів + алерти збоїв',role:'executor'},{id:'4.4',text:'Інтеграційні тести з ІТ-службою клієнта',role:'both'}]},
+      { id:5, title:'Етап 5. Тестування та запуск', duration:'2–3 тижні', goal:'Пройти UAT, підготувати інструкції, виправити дефекти і вийти у дослідну експлуатацію (Go-Live).', period:'postNY', results:['Система пройшла тестування','Користувачі готові','Акт приймання-передачі','Система в дослідній експлуатації'], tasks:[{id:'5.1',text:'UAT з клієнтом та формування UAT-команди',role:'both'},{id:'5.2',text:'Sandbox для безпечного тестування нових змін',role:'executor'},{id:'5.3',text:'Інструкції користувача та адміністратора',role:'executor'},{id:'5.4',text:'Виправити помилки / оптимізувати сценарії',role:'executor'},{id:'5.5',text:'Підготовка до Go-Live',role:'both'}]},
+      { id:6, title:'Етап 6. Післяпроєктна підтримка та розвиток', duration:'постійно', goal:'Моніторинг, оновлення модулів, AI-протоколювання (Notion+n8n), збір фідбеку й план розвитку.', period:'postNY', results:['Стабільна робота системи','AI Hub / дайджести','Задокументована історія змін'], tasks:[{id:'6.1',text:'Моніторинг обмінів, логів, резервного копіювання',role:'executor'},{id:'6.2',text:'Оновлення модулів, розширення функцій',role:'executor'},{id:'6.3',text:'Автоматичні саммарі/дайджести/архів (Notion + n8n)',role:'executor'},{id:'6.4',text:'Збір фідбеку та безперервна UX-оптимізація',role:'both'},{id:'6.5',text:'Планування і реалізація покращень',role:'both'}]},
+    ]
+
+    const DATA = { status:{ phase:'Пілот', scope:'g', schedule:'y', budget:'g', completion:0.62, nextMilestone:{name:'Запуск UAT', due:'2025-10-28'}, need:[ 'Надати доступ до 1С','Підтвердити UAT-сценарії','Призначити UAT-лід' ] }, milestones:[ {name:'Розгортання системи', due:'2025-09-30', owner:'DevOps', criteria:'Prod-ready', state:'done'}, {name:'Налаштування PO', due:'2025-10-08', owner:'FBPM', criteria:'PO flow', state:'done'}, {name:'Імпорт актів', due:'2025-10-20', owner:'FBPM', criteria:'Acts >= 80%', state:'now'}, {name:'Запуск UAT', due:'2025-10-28', owner:'PM', criteria:'UAT plan', state:'next'}, {name:'Пром-реліз', due:'2025-11-10', owner:'PM', criteria:'Go-live', state:'next'} ], diff:[ {t:'+2 задач завершено'},{t:'-1 блокер (OCR таймаут) вирішено'},{t:'+1 новий CR: додати статуси документів у попап'} ], filters:['Фаза: Пілот','Модуль: PO','Відповідальний: PM','Тиждень: поточний'], docs:[ {title:'SOW · Договір', type:'SOW', status:'Approved', link:'#', owner:'Legal', updated:'2025-10-10'}, {title:'ТЗ · FBPM для ІР', type:'Spec', status:'Draft', link:'#', owner:'PM', updated:'2025-10-17'}, {title:'Архітектура · Інтеграції', type:'Architecture', status:'Approved', link:'#', owner:'Architect', updated:'2025-10-12'} ] }
+
+    let TASKS = []
+    let INTERACTIONS = []
+
+    const LS_DONE = 'fbpm_plan_doneMap'
+    const LS_HIST = 'fbpm_hist'
+    const loadJSON = (k,def)=>{ try{ const r=localStorage.getItem(k); return r?JSON.parse(r):def }catch{ return def } }
+    const saveJSON = (k,v)=>{ try{ localStorage.setItem(k, JSON.stringify(v)) }catch{} }
+    let DONE_MAP = loadJSON(LS_DONE, {})
+
+    const el = sel => document.querySelector(sel)
+    const qsAll = sel => Array.from(document.querySelectorAll(sel))
+    const daysLeft = dateStr => { const d = new Date(dateStr); const now = new Date(); const diff = Math.ceil((d - now)/86400000); return diff < 0 ? `прострочено на ${Math.abs(diff)} дн.` : diff }
+    const mailtoPM = () => 'mailto:pm@example.com?subject=Питання щодо FBPM&body=Привіт!'
+    const trimStageTitle = s => { const idx = s.indexOf('. '); return idx>0 ? s.slice(idx+2) : s }
+    const isDone = t => ((t.status||'').toLowerCase().includes('done')|| (t.status||'').toLowerCase().includes('closed')|| (t.status||'').toLowerCase().includes('заверш'))
+    const isInProgress = t => { const s=(t.status||'').toLowerCase(); return s.includes('in progress')||s.includes('в роботі')||s.includes('active')||s.includes('триває') }
+    const isWaiting = t => { const s=(t.status||'').toLowerCase(); return s.includes('waiting')||s.includes('pending')||s.includes('очікуван') }
+    const byEtaAsc = (a,b)=> new Date(a.eta||'2100-12-31') - new Date(b.eta||'2100-12-31')
+    function currentStageName(){ for (const s of PLAN){ const all=s.tasks.length; const done=s.tasks.filter(t=> DONE_MAP[s.id+':'+t.id]).length; if(done<all) return `Етап ${s.id}. ${trimStageTitle(s.title)}` } const last=PLAN[PLAN.length-1]; return `Етап ${last.id}. ${trimStageTitle(last.title)}` }
+
+    function renderHero(){
+      el('#phase').textContent = currentStageName()
+      const total = TASKS.length || 0
+      const done = TASKS.filter(isDone).length
+      el('#pct').textContent = total? Math.round(done/total*100)+'%' : '—'
+      const active = TASKS.filter(isInProgress).sort(byEtaAsc)[0]
+      const ordered = TASKS.slice().sort(byEtaAsc)
+      const idx = active? ordered.findIndex(t=>t.id===active.id) : -1
+      const next = idx>=0 ? (ordered.slice(idx+1).reverse().find(t=>!isDone(t)) || ordered[ordered.length-1]) : ordered.find(t=>!isDone(t))
+      el('#nextM').textContent = active? (next? next.title : '—') : (ordered[0]?.title||'—')
+      const ms = DATA.milestones.find(m=>m.state==='next' || m.state==='now')
+      el('#ddays').textContent = daysLeft((ms&&ms.due)||DATA.status.nextMilestone.due)
+      el('#scopeDot').className = 'dot ' + (DATA.status.scope||'g')
+      el('#schedDot').className = 'dot ' + (DATA.status.schedule||'g')
+      el('#budgetDot').className = 'dot ' + (DATA.status.budget||'g')
+      ;['need1','need2','need3'].forEach((id,i)=>{ el('#'+id).textContent = DATA.status.need[i] || '' })
+      el('#askPM').setAttribute('href', mailtoPM())
     }
-    return STAGES.length-1;
-  },[tasksByStage,doneMap]);
 
-  const roleSet=new Set(roleFilter);
-  function taskOk(stageId,task){
-    const role=(task.Role||"both").toLowerCase();
-    const roleOk=roleSet.has(role);
-    const key=`${stageId}:${task.id}`; const done=!!doneMap[key];
-    const statusOk=statusFilter==="all"||(statusFilter==="done"&&done)||(statusFilter==="notdone"&&!done);
-    return roleOk&&statusOk;
-  }
-  const stageScrollTo=id=>{ const el=document.getElementById(`stage-${id}`); if(el) el.scrollIntoView({behavior:"smooth",block:"start"}); };
-  const resetAll=()=>{ if(confirm("Очистити позначки виконання для всіх задач?")){ try{ localStorage.removeItem("fbbp_ir_doneMap"); }catch{} location.reload(); } };
+    function renderKPI(){
+      const total = TASKS.length
+      const done = TASKS.filter(isDone).length
+      const overdue = TASKS.filter(t=> new Date(t.eta||'2100-12-31') < new Date() && !isDone(t)).length
+      const waiting = TASKS.filter(isWaiting).length
+      const modReady = total? Math.round(done/total*100) : 0
+      el('#k_done').textContent = String(done)
+      el('#k_over').textContent = String(overdue)
+      el('#k_dec').textContent  = String(waiting)
+      el('#k_mod').textContent  = modReady + '%'
+    }
 
-  return (
-    <div>
-      {/* Header */}
-      <header className="sticky top-0 z-40 backdrop-blur bg-white/80 border-b border-[color:var(--brand-grayLine)]">
-        <div className="max-w-7xl mx-auto px-4 md:px-6 py-3 flex items-center gap-4">
-          <div className="h-9 w-9 rounded-full" aria-hidden="true" style={{background:`conic-gradient(from 180deg, ${BRAND.primary}, ${BRAND.accent})`}} />
-          <div className="flex-1"><h1 className="text-base md:text-lg font-semibold">Finance BPM · План впровадження ІР</h1>
-            <p className="text-[11px] md:text-xs text-gray-500">Версія 1.3 · Жовтень 2025 · Світла тема</p></div>
-          <nav className="hidden md:flex gap-2" aria-label="Етапи">
-            {STAGES.map((s,i)=>(<StagePill key={s.id} label={`Етап ${s.id}`} active={s.id-1===currentStageIndex} onClick={()=>stageScrollTo(s.id)} />))}
-          </nav>
-          <a href={MAIL} className="text-sm px-3 py-1 rounded-md border border-[color:var(--brand-primary)] text-[color:var(--brand-primary)] hover:bg-[color:var(--brand-primary)] hover:text-white transition">Контакти</a>
-        </div>
-      </header>
+    function renderMilestones(){ const box = el('#marks'); box.innerHTML = ''
+      DATA.milestones.forEach(m=>{ const div = document.createElement('div'); div.className = 'mark ' + m.state
+        div.innerHTML = '<div class="when">'+m.due+'</div><div class="name">'+m.name+'</div><div class="muted">'+m.owner+'</div>'
+        div.title = 'Критерії: '+m.criteria; box.appendChild(div) })
+      const idxNow = DATA.milestones.findIndex(x=>x.state==='now')
+      const after = idxNow>=0 ? DATA.milestones[idxNow+1] : DATA.milestones.find(x=>x.state==='next')
+      if(after){ DATA.status.nextMilestone = { name: after.name, due: after.due } }
+    }
 
-      {/* Hero / Progress */}
-      <div className="max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-10" id="top">
-        <div className="grid md:grid-cols-3 gap-5">
-          <SectionCard title="Прогрес проєкту" subtitle="Дані по тасках тягнуться з Notion"
-            right={<div className="text-right"><div className="text-sm text-gray-500">Завершено</div><div className="text-lg font-semibold">{doneCount} / {totalTasks}</div></div>}>
-            <div className="space-y-3">
-              <ProgressBar value={progress}/>
-              <div className="flex items-center justify-between text-xs text-gray-500" aria-label="Маркер етапів">
-                {STAGES.map((s,i)=>{
-                  const list=tasksByStage.get(s.id)||[];
-                  const allDone=list.length>0 && list.every(t=>doneMap[`${s.id}:${t.id}`]);
-                  return (<button key={s.id} onClick={()=>stageScrollTo(s.id)}
-                    className={cls("flex-1 h-2 mx-0.5 rounded-full", allDone?"bg-[color:var(--brand-primary)]":i===currentStageIndex?"bg-[color:var(--brand-accent)]":"bg-gray-300")}
-                    title={s.title} aria-label={`Перейти до ${s.title}`} />);
-                })}
-              </div>
-              <div className="text-xs text-gray-600">Поточний етап: <span className="font-medium">Етап {currentStageIndex+1}</span></div>
-            </div>
-          </SectionCard>
+    function renderGantt(){
+      const tasks = TASKS.filter(t=> t.eta)
+      const host = document.querySelector('#ms-title').parentElement.parentElement
+      let svg = host.querySelector('svg.gantt')
+      if(!tasks.length){ if(svg) svg.remove(); return }
+      const min = new Date(Math.min(...tasks.map(t=>+new Date(t.eta))));
+      const max = new Date(Math.max(...tasks.map(t=>+new Date(t.eta))));
+      const pad = 24, rowH = 18, w = host.clientWidth-32, h = (tasks.length*rowH)+pad*2
+      const x = d => pad + ( (new Date(d)-min) / (max-min || 1) ) * (w-pad*2)
+      const bars = tasks.map((t,i)=>({ y: pad + i*rowH, x0: pad, x1: x(t.eta), label: (t.title||'') }))
+      const ns='http://www.w3.org/2000/svg'
+      if(svg) svg.remove(); svg = document.createElementNS(ns,'svg'); svg.setAttribute('class','gantt'); svg.setAttribute('width','100%'); svg.setAttribute('height',String(h))
+      const axis = document.createElementNS(ns,'line'); axis.setAttribute('x1',pad); axis.setAttribute('y1',pad/2); axis.setAttribute('x2',w-pad); axis.setAttribute('y2',pad/2); axis.setAttribute('stroke','#D7D5F4'); svg.appendChild(axis)
+      bars.forEach(b=>{ const r=document.createElementNS(ns,'rect'); r.setAttribute('x',b.x0); r.setAttribute('y',b.y); r.setAttribute('width',Math.max(6,b.x1-b.x0)); r.setAttribute('height',10); r.setAttribute('rx',5); r.setAttribute('fill','url(#g)'); svg.appendChild(r); const t=document.createElementNS(ns,'text'); t.setAttribute('x',b.x1+6); t.setAttribute('y',b.y+9); t.setAttribute('font-size','11'); t.setAttribute('fill','#4B5563'); t.textContent=b.label; svg.appendChild(t) })
+      const defs=document.createElementNS(ns,'defs'); const grad=document.createElementNS(ns,'linearGradient'); grad.setAttribute('id','g'); grad.setAttribute('x1','0'); grad.setAttribute('x2','1'); grad.innerHTML='<stop offset="0%" stop-color="#392EC9"/><stop offset="100%" stop-color="#EF0650"/>'
+      defs.appendChild(grad); svg.appendChild(defs)
+      host.appendChild(svg)
+    }
 
-          <SectionCard title="Фільтри" subtitle="Фільтрація відбувається поверх Notion-даних">
-            <div className="space-y-4">
-              <div><div className="text-xs text-gray-500 mb-2">Етап</div>
-                <div className="flex flex-wrap gap-2">
-                  <FilterChip label="Всі" active={stageFilter==="all"} onClick={()=>setStageFilter("all")} />
-                  {STAGES.map(s=><FilterChip key={s.id} label={`${s.id}`} active={stageFilter===String(s.id)} onClick={()=>setStageFilter(String(s.id))} />)}
-                </div>
-              </div>
-              <div><div className="text-xs text-gray-500 mb-2">Період</div>
-                <div className="flex flex-wrap gap-2">
-                  <FilterChip label="Всі" active={periodFilter==="all"} onClick={()=>setPeriodFilter("all")} />
-                  <FilterChip label="До Нового року (1–3)" active={periodFilter==="preNY"} onClick={()=>setPeriodFilter("preNY")} />
-                  <FilterChip label="Після Нового року (4–6)" active={periodFilter==="postNY"} onClick={()=>setPeriodFilter("postNY")} />
-                </div>
-              </div>
-              <div><div className="text-xs text-gray-500 mb-2">Роль задачі</div>
-                <div className="flex flex-wrap gap-2">
-                  {["executor","client","both"].map(r=>(
-                    <button key={r} onClick={()=>setRoleFilter(p=>p.includes(r)?p.filter(x=>x!==r):[...p,r])}
-                      className={cls("px-3 py-1 rounded-full text-xs border",roleFilter.includes(r)?"bg-white border-[color:var(--brand-primary)]":"bg-white border-gray-200 text-gray-500")}>
-                      {r==="executor"?"Виконавець":r==="client"?"Клієнт":"Разом"}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <div><div className="text-xs text-gray-500 mb-2">Статус</div>
-                <div className="flex flex-wrap gap-2">
-                  <FilterChip label="Всі" active={statusFilter==="all"} onClick={()=>setStatusFilter("all")} />
-                  <FilterChip label="Виконані" active={statusFilter==="done"} onClick={()=>setStatusFilter("done")} />
-                  <FilterChip label="Невиконані" active={statusFilter==="notdone"} onClick={()=>setStatusFilter("notdone")} />
-                </div>
-              </div>
-              <div className="flex justify-between items-center">
-                <a href={MAIL} className="text-sm text-[color:var(--brand-primary)] underline">Зв’язатися</a>
-                <button onClick={resetAll} className="text-xs text-gray-500 hover:text-gray-800">Очистити позначки</button>
-              </div>
-            </div>
-          </SectionCard>
+    function renderDiff(){ const d = el('#diff'); d.innerHTML = ''
+      DATA.diff.forEach(x=>{ const li=document.createElement('li'); li.className='item'; li.textContent=x.t; d.appendChild(li) })
+      const f = el('#filters'); f.innerHTML=''; DATA.filters.forEach(x=>{ const s=document.createElement('span'); s.className='chip'; s.textContent=x; f.appendChild(s) }) }
 
-          <SectionCard title="Контакти" subtitle="ABM Cloud · Finance BPM">
-            <div className="space-y-2 text-sm">
-              <div>Пошта: <a className="text-[color:var(--brand-primary)] underline" href={MAIL}>riae@abmcloud.com</a></div>
-              <div className="text-gray-500">Для термінових питань — префікс теми <span className="font-mono">[IR-FinanceBPM]</span>.</div>
-            </div>
-          </SectionCard>
-        </div>
-      </div>
+    function renderDocs(filter){ const box = el('#docs'); box.innerHTML=''
+      DATA.docs.filter(d => !filter || d.status===filter).forEach(d=>{ const c=document.createElement('div'); c.className='card'
+        c.innerHTML = '<div class="muted">'+d.type+' · '+d.status+'</div><div class="title" style="margin:4px 0 6px">'+d.title+'</div><a class="btn" href="'+d.link+'">Відкрити</a><div class="muted" style="margin-top:6px">'+d.owner+' · '+d.updated+'</div>'
+        box.appendChild(c) }) }
 
-      {/* Interaction History */}
-      <div className="max-w-7xl mx-auto px-4 md:px-6 pb-6">
-        <InteractionHistory all={all} setAll={setAll} />
-      </div>
+    function mapType(t){ const s=(t||'').toString().trim().toLowerCase(); if(['task','таск','завдання'].includes(s)) return 'task'; if(['meeting','зустріч'].includes(s)) return 'зустріч'; if(['decision','рішення'].includes(s)) return 'рішення'; if(['question','питання'].includes(s)) return 'питання'; if(['note','нотатка'].includes(s)) return 'нотатка'; if(['answer','відповідь'].includes(s)) return 'відповідь'; return 'нотатка' }
 
-      {/* Stages */}
-      <div className="max-w-7xl mx-auto px-4 md:px-6 pb-10 space-y-6">
-        {filteredStages.map(stage=>{
-          const list=(tasksByStage.get(stage.id)||[]).filter(t=>taskOk(stage.id,t));
-          const allForStage=tasksByStage.get(stage.id)||[];
-          const stageDone=allForStage.filter(t=>doneMap[`${stage.id}:${t.id}`]).length;
-          const stagePct=Math.round((stageDone/Math.max(1,allForStage.length))*100);
-          return (
-            <div key={stage.id} id={`stage-${stage.id}`} className="scroll-mt-20">
-              <SectionCard title={`Етап ${stage.id} · ${stage.title.replace(/^Етап \\d+\\. /,"")}`}
-                subtitle={`Тривалість: ${stage.duration} · Мета: ${stage.goal}`}
-                right={<div className="text-right"><div className="text-xs text-gray-500">Прогрес етапу</div><div className="text-sm font-semibold">{stageDone}/{allForStage.length} ({stagePct}%)</div></div>}>
-                <div className="grid md:grid-cols-3 gap-5">
-                  <div className="md:col-span-2">
-                    <h4 className="text-sm font-semibold text-[color:var(--brand-oxford)] mb-2">Завдання (з Notion)</h4>
-                    <div className="divide-y divide-[color:var(--brand-grayLine)] bg-white rounded-xl border border-[color:var(--brand-grayLine)]/80">
-                      {list.map(t=>(<div key={t.id} className="px-4 md:px-5"><TaskRow stageId={stage.id} task={t} doneMap={doneMap} setDoneMap={setDoneMap}/></div>))}
-                      {list.length===0 && <div className="p-5 text-sm text-gray-500">Немає задач за обраними фільтрами.</div>}
-                    </div>
-                  </div>
-                  <aside>
-                    <h4 className="text-sm font-semibold text-[color:var(--brand-oxford)] mb-2">Результати етапу</h4>
-                    <ul className="space-y-2 text-sm bg-white rounded-xl border border-[color:var(--brand-grayLine)]/80 p-4">
-                      {stage.results.map((r,i)=>(<li key={i} className="flex gap-2 items-start"><span className="mt-1 h-2 w-2 rounded-full" style={{background:BRAND.primary}}></span><span>{r}</span></li>))}
-                    </ul>
-                  </aside>
-                </div>
-              </SectionCard>
-            </div>
-          );
-        })}
-      </div>
+    function renderHistory(items){ const body=el('#histBody'); body.innerHTML=''; const tag=(el('#searchTag').value||'').trim().toLowerCase(); items.filter(m=>!tag||(((m.summary||'')+' '+(m.title||'')).toLowerCase().includes(tag))).slice(0,10).forEach(m=>{ const tr=document.createElement('tr'); const link=m.link? '<a href="'+m.link+'" target="_blank" rel="noopener">Лінк</a>' : ''; const dateStr=(new Date(m.date)).toLocaleDateString('uk-UA'); tr.innerHTML = '<td>'+dateStr+'</td><td>'+m.type+'</td><td>'+(m.title||'')+'</td><td>'+(m.summary||'')+'</td><td>'+link+'</td>'; body.appendChild(tr) }) }
 
-      {/* Footer */}
-      <footer className="border-t border-[color:var(--brand-grayLine)] bg-white">
-        <div className="max-w-7xl mx-auto px-4 md:px-6 py-6 text-sm text-gray-600 flex flex-col md:flex-row items-center justify-between gap-3">
-          <div>© <span id="y"></span> ABM Cloud · Finance BPM · План впровадження ІР</div>
-          <div className="flex items-center gap-2"><a href="#top" className="underline">Вгору</a><span className="opacity-40">·</span><a href={MAIL} className="underline">Зв’язатися</a></div>
-        </div>
-      </footer>
-    </div>
-  );
-}
+    async function histLoad(){ try{ const r = await fetch(HIST_GET_ENDPOINT, { method:'GET' }); if(!r.ok) throw new Error(r.status); const raw = await r.text(); let j; try{ j = JSON.parse(raw) }catch{ console.warn('hist JSON parse fail'); return } let list=[]; if(Array.isArray(j)){ list = Array.isArray(j[0] && j[0].list)? j[0].list : j } else if (j && Array.isArray(j.list)){ list = j.list } const norm = (list||[]).map((x,i)=>({ id: String((x && (x.ExtID || x.id)) || (Date.now()+'-'+i)), date: (x && (x.DateEdit || x.date)) || new Date().toISOString(), type: mapType(x && (x.Type || x.type)), title: (x && (x.Name || x.title)) || '', summary: (x && (x.Description || x.summary)) || '', link: (x && x.link) || '', status: (x && (x.Status || x.status)) || '', eta: (x && (x.ETA || x.eta || x.due)) || '', owner: (x && (x.Owner || x.owner)) || '', prio: (x && (x.Priority || x.prio)) || '', phase: (x && (x.Phase || x.phase)) || '', mod: (x && (x.Module || x.mod)) || '' }))
+      TASKS = norm.filter(x=> x.type==='task').sort(byEtaAsc)
+      INTERACTIONS = norm.filter(x=> x.type!=='task').sort((a,b)=> new Date(b.date)-new Date(a.date))
+      saveJSON(LS_HIST, INTERACTIONS)
+      renderHistory(INTERACTIONS); renderTasks('all','all'); renderKPI(); renderMilestones(); renderHero(); renderGantt()
+    }catch(e){ const cached=loadJSON(LS_HIST,[]); renderHistory(cached); renderTasks('all','all'); renderKPI(); renderMilestones(); renderHero(); renderGantt() } }
 
-const root=ReactDOM.createRoot(document.getElementById("root"));
-root.render(<App/>);
-const _y=document.getElementById("y"); if(_y) _y.textContent=new Date().getFullYear();
-</script>
+    function addHist(){ const title=el('#histTitle').value.trim(); const summary=el('#histSummary').value.trim(); const type=el('#histType').value; const link=el('#histLink').value.trim(); if(!title && !summary) return; const cur=loadJSON(LS_HIST,[]); const it={ id: String(Date.now()), date: new Date().toISOString(), type, title, summary, link }; const next=[it, ...cur]; saveJSON(LS_HIST,next); renderHistory(next); el('#histTitle').value=''; el('#histSummary').value=''; el('#histLink').value=''; }
 
-  <!-- ========================================
-       PROD BUILD HINT (видаліть у фінальній версії)
-       1) npm create vite@latest fbpm-plan -- --template react
-       2) npm i
-       3) npm i -D tailwindcss postcss autoprefixer
-       4) npx tailwindcss init -p
-       5) перенесіть JSX у src/App.jsx, токени в CSS, заберіть @babel/standalone і CDN tailwind
-       6) npm run build && deploy (Netlify/Vercel/Nginx)
-  ======================================== -->
+    let STAGE_FILTER='all'; let ROLE_FILTER=new Set(['executor','client','both'])
+    function renderPlan(){ const box=el('#planWrap'); box.innerHTML=''; PLAN.filter(s=> STAGE_FILTER==='all' || s.period===STAGE_FILTER).forEach(s=>{ const stage=document.createElement('div'); stage.className='stage'; const all=s.tasks.length; const done=s.tasks.filter(t=> DONE_MAP[s.id+':'+t.id]).length; const pct=Math.round(done/Math.max(1,all)*100); const headingTitle='Етап '+s.id+' · '+trimStageTitle(s.title); stage.innerHTML='<div class="row" style="justify-content:space-between;align-items:center"><div><div class="title">'+headingTitle+'</div><div class="muted">Тривалість: '+s.duration+' · Мета: '+s.goal+'</div></div><div class="muted">Прогрес: <strong>'+done+'/'+all+' ('+pct+'%)</strong></div></div>'; const grid=document.createElement('div'); grid.className='row'; grid.style.gap='16px'; const left=document.createElement('div'); left.style.flex='2'; const right=document.createElement('aside'); right.style.flex='1'; s.tasks.filter(t=> ROLE_FILTER.has(t.role)).forEach(t=>{ const k=s.id+':'+t.id; const mark=!!DONE_MAP[k]; const line=document.createElement('div'); line.className='task'; const cbId='cb_'+k; const roleCls = t.role==='executor'? 'role-ex' : (t.role==='client'? 'role-cl' : 'role-bo'); line.innerHTML='<input id="'+cbId+'" type="checkbox" '+(mark?'checked':'')+' style="margin-top:4px">'+'<label for="'+cbId+'" style="flex:1">'+t.id+' · '+t.text+'</label>'+'<span class="badge '+roleCls+'">'+(t.role==='executor'?'виконавець':(t.role==='client'?'клієнт':'разом'))+'</span>'; left.appendChild(line); line.querySelector('input').addEventListener('change',(e)=>{ DONE_MAP[k]=e.target.checked; saveJSON(LS_DONE,DONE_MAP); renderPlan(); renderHero() }) }); const resTitle=document.createElement('div'); resTitle.className='title'; resTitle.style.marginBottom='6px'; resTitle.textContent='Результати етапу'; right.appendChild(resTitle); const ul=document.createElement('ul'); ul.className='list'; s.results.forEach(r=>{ const li=document.createElement('li'); li.className='item'; li.textContent=r; ul.appendChild(li) }); right.appendChild(ul); grid.appendChild(left); grid.appendChild(right); stage.appendChild(grid); box.appendChild(stage) }) }
+
+    function renderTasks(filterKey, filterVal){ const body = el('#taskBody'); body.innerHTML=''; const src = (filterKey==='all')? TASKS : TASKS.filter(t=> !filterKey || (t[filterKey]===filterVal)); src.forEach(t=>{ const tr=document.createElement('tr'); tr.innerHTML='<td>'+(t.title||t.name||'')+'</td><td>'+(t.prio||t.priority||'')+'</td><td>'+(t.owner||'')+'</td><td>'+(t.eta||'')+'</td><td>'+(t.status||'')+'</td>'; body.appendChild(tr) }) }
+
+    renderDiff(); renderDocs(); renderPlan(); renderMilestones(); histLoad()
+
+    function toggleActiveChip(chips, target){ chips.forEach(x=>x.classList.remove('active')); target.classList.add('active') }
+    qsAll('[data-f]').forEach(ch => ch.addEventListener('click', () => { const [k,v] = ch.dataset.f.split(':'); renderTasks(k, v); toggleActiveChip(qsAll('[data-f]'), ch); }))
+    qsAll('[data-sf]').forEach(ch => ch.addEventListener('click', () => { STAGE_FILTER = ch.dataset.sf; renderPlan(); toggleActiveChip(qsAll('[data-sf]'), ch) }))
+    qsAll('[data-rf]').forEach(ch => ch.addEventListener('click', () => { const v = ch.dataset.rf; ch.classList.toggle('active'); if(ROLE_FILTER.has(v)) ROLE_FILTER.delete(v); else ROLE_FILTER.add(v); renderPlan() }))
+    qsAll('[data-docf]').forEach(ch => ch.addEventListener('click', () => { qsAll('[data-docf]').forEach(x=>x.classList.remove('active')); ch.classList.add('active'); renderDocs(ch.dataset.docf) }))
+    el('#searchTag').addEventListener('input', ()=>{ renderHistory(INTERACTIONS) })
+    el('#histAdd').addEventListener('click', addHist)
+    el('#btnFilters').addEventListener('click', ()=>alert('Фільтри: фаза · модуль · відповідальний · період (TODO: модальне вікно)'))
+  </script>
 </body>
 </html>
