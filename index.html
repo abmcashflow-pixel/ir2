@@ -192,138 +192,388 @@
     <div class="footer">ABM Cloud · FBPM Dashboard + План ІР · Версія 0.4 · Статичний HTML/JS · Шрифти Montserrat · Кольори бренду</div>
   </main>
 
-  <script>
-    const MAIL = 'mailto:riae@abmcloud.com'
-    const HIST_GET_ENDPOINT  = 'https://finbpm3.app.n8n.cloud/webhook/6bf259a0-7012-466b-9a35-314fa54daea3'
-    const HIST_POST_ENDPOINT = 'https://finbpm3.app.n8n.cloud/webhook/6bf259a0-7012-466b-9a35-314fa54daea3'
+<script>
+  const MAIL = 'mailto:riae@abmcloud.com'
+  const HIST_GET_ENDPOINT  = 'https://finbpm3.app.n8n.cloud/webhook/6bf259a0-7012-466b-9a35-314fa54daea3'
+  const HIST_POST_ENDPOINT = 'https://finbpm3.app.n8n.cloud/webhook/6bf259a0-7012-466b-9a35-314fa54daea3'
 
-    const PLAN = [
-      { id:1, title:'Етап 1. Оновлення ТЗ, підготовка та розгортання', duration:'2–3 тижні', goal:'Узгодити PRD v2.0, розгорнути систему на сервері, організувати аналітику та план реалізації.', period:'preNY', results:['PRD v2.0 та Project Plan v1.0','Тестова інстанція Finance BPM (сервер, БД, доступи)','Узгоджена структура архіву','Запущений Notion AI Hub','Демо-сценарій PO–Invoice–Act'], tasks:[{id:'1.1',text:'3–4 зустрічі для ревізії ТЗ → PRD v2.0 (Implementation Plan)',role:'both'},{id:'1.2',text:'Оновити терміни/логіку процесів (PO, Invoice, Act, архів, погодження)',role:'executor'},{id:'1.3',text:'Узгодити ролі, учасників і канали комунікацій',role:'both'},{id:'1.4',text:'Розгортання: платформа, БД, SMTP/SFTP/API, ролі, логи, бекапи',role:'executor'},{id:'1.5',text:'Аналіз процесів ІР: закупівлі, документообіг, погодження',role:'executor'},{id:'1.6',text:'Сесії з фінансами/закупівлями/бухгалтерією → as-is/to-be',role:'both'},{id:'1.7',text:'Структура архіву: тип документа, метадані, доступи',role:'executor'},{id:'1.8',text:'Підготувати PRD структуру та Project Plan у Notion',role:'executor'},{id:'1.9',text:'Погодити Project Plan v1.0 та демо PO–Invoice–Act',role:'both'},{id:'1.10',text:'Approval meeting результатів етапу',role:'client'}]},
-      { id:2, title:'Етап 2. Документи, довідники та користувачі', duration:'2–3 тижні', goal:'Створити модель даних: типи документів, довідники, контролі, звіти, користувачі та шаблони друку.', period:'preNY', results:['Типи документів (PO, Invoice, Act)','Довідники та контролі','Шаблони друку, первинні звіти','Користувачі/ролі/доступи','Архівні дані у системі'], tasks:[{id:'2.1',text:'Створити PO, Invoice, Act (типи документів)',role:'executor'},{id:'2.2',text:'Налаштувати довідники: контрагенти, договори, підрозділи, валюти, статті',role:'executor'},{id:'2.3',text:'Контролі: унікальність, узгодження сум/статусів, обов’язкові поля',role:'executor'},{id:'2.4',text:'Звіти: Баланс по PO; Баланс по постачальнику',role:'executor'},{id:'2.5',text:'Шаблони друку (PDF/XLSX) ↔ узгодження макетів',role:'both'},{id:'2.6',text:'Імпорт користувачів (Excel/AD), ролі Viewer/Editor/Approver/Admin',role:'executor'},{id:'2.7',text:'Перевірка доступів та імпорт архіва до модуля “Архів”',role:'both'}]},
-      { id:3, title:'Етап 3. Бізнес-процеси', duration:'2 тижні', goal:'Налаштувати погодження документів, ролі/доступи за статусами, нотифікації та провести UAT процесів.', period:'preNY', results:['Робочі погодження для PO/Invoice/Act','Форми задач/виконавці','Business Process Overview v1.0'], tasks:[{id:'3.1',text:'Побудувати маршрути погоджень PO/Invoice/Act',role:'executor'},{id:'3.2',text:'Стани, правила переходів, виконавці',role:'executor'},{id:'3.3',text:'Доступи/ролі залежно від статусу',role:'executor'},{id:'3.4',text:'Автоповідомлення авторам про “незакриті” документи',role:'executor'},{id:'3.5',text:'UAT погоджень з ключовими користувачами',role:'both'},{id:'3.6',text:'За потреби спростити UX (короткі маршрути / групові рішення)',role:'executor'}]},
-      { id:4, title:'Етап 4. Реєстри та інтеграції з SAP', duration:'2 тижні', goal:'Забезпечити реєстри документів і обміни з SAP (SFTP/API) з моніторингом і логуванням.', period:'postNY', results:['Реєстри погоджених документів','Інтеграції з SAP налаштовано','Протокол інтеграційних тестів'], tasks:[{id:'4.1',text:'Реєстри Invoice/Act з фільтрами, пошуком, масовими діями',role:'executor'},{id:'4.2',text:'SAP: імпорт контрагентів, експорт погоджених документів (SFTP/API)',role:'executor'},{id:'4.3',text:'Моніторинг/логування обмінів + алерти збоїв',role:'executor'},{id:'4.4',text:'Інтеграційні тести з ІТ-службою клієнта',role:'both'}]},
-      { id:5, title:'Етап 5. Тестування та запуск', duration:'2–3 тижні', goal:'Пройти UAT, підготувати інструкції, виправити дефекти і вийти у дослідну експлуатацію (Go-Live).', period:'postNY', results:['Система пройшла тестування','Користувачі готові','Акт приймання-передачі','Система в дослідній експлуатації'], tasks:[{id:'5.1',text:'UAT з клієнтом та формування UAT-команди',role:'both'},{id:'5.2',text:'Sandbox для безпечного тестування нових змін',role:'executor'},{id:'5.3',text:'Інструкції користувача та адміністратора',role:'executor'},{id:'5.4',text:'Виправити помилки / оптимізувати сценарії',role:'executor'},{id:'5.5',text:'Підготовка до Go-Live',role:'both'}]},
-      { id:6, title:'Етап 6. Післяпроєктна підтримка та розвиток', duration:'постійно', goal:'Моніторинг, оновлення модулів, AI-протоколювання (Notion+n8n), збір фідбеку й план розвитку.', period:'postNY', results:['Стабільна робота системи','AI Hub / дайджести','Задокументована історія змін'], tasks:[{id:'6.1',text:'Моніторинг обмінів, логів, резервного копіювання',role:'executor'},{id:'6.2',text:'Оновлення модулів, розширення функцій',role:'executor'},{id:'6.3',text:'Автоматичні саммарі/дайджести/архів (Notion + n8n)',role:'executor'},{id:'6.4',text:'Збір фідбеку та безперервна UX-оптимізація',role:'both'},{id:'6.5',text:'Планування і реалізація покращень',role:'both'}]},
+  const PLAN = [
+    { id:1, title:'Етап 1. Оновлення ТЗ, підготовка та розгортання', duration:'2–3 тижні', goal:'Узгодити PRD v2.0, розгорнути систему на сервері, організувати аналітику та план реалізації.', period:'preNY',
+      results:['PRD v2.0 та Project Plan v1.0','Тестова інстанція Finance BPM (сервер, БД, доступи)','Узгоджена структура архіву','Запущений Notion AI Hub','Демо-сценарій PO–Invoice–Act'],
+      tasks:[
+        {id:'1.1',text:'3–4 зустрічі для ревізії ТЗ → PRD v2.0 (Implementation Plan)',role:'both'},
+        {id:'1.2',text:'Оновити терміни/логіку процесів (PO, Invoice, Act, архів, погодження)',role:'executor'},
+        {id:'1.3',text:'Узгодити ролі, учасників і канали комунікацій',role:'both'},
+        {id:'1.4',text:'Розгортання: платформа, БД, SMTP/SFTP/API, ролі, логи, бекапи',role:'executor'},
+        {id:'1.5',text:'Аналіз процесів ІР: закупівлі, документообіг, погодження',role:'executor'},
+        {id:'1.6',text:'Сесії з фінансами/закупівлями/бухгалтерією → as-is/to-be',role:'both'},
+        {id:'1.7',text:'Структура архіву: тип документа, метадані, доступи',role:'executor'},
+        {id:'1.8',text:'Підготувати PRD структуру та Project Plan у Notion',role:'executor'},
+        {id:'1.9',text:'Погодити Project Plan v1.0 та демо PO–Invoice–Act',role:'both'},
+        {id:'1.10',text:'Approval meeting результатів етапу',role:'client'}
+      ]},
+    { id:2, title:'Етап 2. Документи, довідники та користувачі', duration:'2–3 тижні', goal:'Створити модель даних: типи документів, довідники, контролі, звіти, користувачі та шаблони друку.', period:'preNY',
+      results:['Типи документів (PO, Invoice, Act)','Довідники та контролі','Шаблони друку, первинні звіти','Користувачі/ролі/доступи','Архівні дані у системі'],
+      tasks:[
+        {id:'2.1',text:'Створити PO, Invoice, Act (типи документів)',role:'executor'},
+        {id:'2.2',text:'Налаштувати довідники: контрагенти, договори, підрозділи, валюти, статті',role:'executor'},
+        {id:'2.3',text:'Контролі: унікальність, узгодження сум/статусів, обов’язкові поля',role:'executor'},
+        {id:'2.4',text:'Звіти: Баланс по PO; Баланс по постачальнику',role:'executor'},
+        {id:'2.5',text:'Шаблони друку (PDF/XLSX) ↔ узгодження макетів',role:'both'},
+        {id:'2.6',text:'Імпорт користувачів (Excel/AD), ролі Viewer/Editor/Approver/Admin',role:'executor'},
+        {id:'2.7',text:'Перевірка доступів та імпорт архіва до модуля “Архів”',role:'both'}
+      ]},
+    { id:3, title:'Етап 3. Бізнес-процеси', duration:'2 тижні', goal:'Налаштувати погодження документів, ролі/доступи за статусами, нотифікації та провести UAT процесів.', period:'preNY',
+      results:['Робочі погодження для PO/Invoice/Act','Форми задач/виконавці','Business Process Overview v1.0'],
+      tasks:[
+        {id:'3.1',text:'Побудувати маршрути погоджень PO/Invoice/Act',role:'executor'},
+        {id:'3.2',text:'Стани, правила переходів, виконавці',role:'executor'},
+        {id:'3.3',text:'Доступи/ролі залежно від статусу',role:'executor'},
+        {id:'3.4',text:'Автоповідомлення авторам про “незакриті” документи',role:'executor'},
+        {id:'3.5',text:'UAT погоджень з ключовими користувачами',role:'both'},
+        {id:'3.6',text:'За потреби спростити UX (короткі маршрути / групові рішення)',role:'executor'}
+      ]},
+    { id:4, title:'Етап 4. Реєстри та інтеграції з SAP', duration:'2 тижні', goal:'Забезпечити реєстри документів і обміни з SAP (SFTP/API) з моніторингом і логуванням.', period:'postNY',
+      results:['Реєстри погоджених документів','Інтеграції з SAP налаштовано','Протокол інтеграційних тестів'],
+      tasks:[
+        {id:'4.1',text:'Реєстри Invoice/Act з фільтрами, пошуком, масовими діями',role:'executor'},
+        {id:'4.2',text:'SAP: імпорт контрагентів, експорт погоджених документів (SFTP/API)',role:'executor'},
+        {id:'4.3',text:'Моніторинг/логування обмінів + алерти збоїв',role:'executor'},
+        {id:'4.4',text:'Інтеграційні тести з ІТ-службою клієнта',role:'both'}
+      ]},
+    { id:5, title:'Етап 5. Тестування та запуск', duration:'2–3 тижні', goal:'Пройти UAT, підготувати інструкції, виправити дефекти і вийти у дослідну експлуатацію (Go-Live).', period:'postNY',
+      results:['Система пройшла тестування','Користувачі готові','Акт приймання-передачі','Система в дослідній експлуатації'],
+      tasks:[
+        {id:'5.1',text:'UAT з клієнтом та формування UAT-команди',role:'both'},
+        {id:'5.2',text:'Sandbox для безпечного тестування нових змін',role:'executor'},
+        {id:'5.3',text:'Інструкції користувача та адміністратора',role:'executor'},
+        {id:'5.4',text:'Виправити помилки / оптимізувати сценарії',role:'executor'},
+        {id:'5.5',text:'Підготовка до Go-Live',role:'both'}
+      ]},
+    { id:6, title:'Етап 6. Післяпроєктна підтримка та розвиток', duration:'постійно', goal:'Моніторинг, оновлення модулів, AI-протоколювання (Notion+n8n), збір фідбеку й план розвитку.', period:'postNY',
+      results:['Стабільна робота системи','AI Hub / дайджести','Задокументована історія змін'],
+      tasks:[
+        {id:'6.1',text:'Моніторинг обмінів, логів, резервного копіювання',role:'executor'},
+        {id:'6.2',text:'Оновлення модулів, розширення функцій',role:'executor'},
+        {id:'6.3',text:'Автоматичні саммарі/дайджести/архів (Notion + n8n)',role:'executor'},
+        {id:'6.4',text:'Збір фідбеку та безперервна UX-оптимізація',role:'both'},
+        {id:'6.5',text:'Планування і реалізація покращень',role:'both'}
+      ]}
+  ]
+
+  const DATA = {
+    status:{ phase:'Пілот', scope:'g', schedule:'y', budget:'g', completion:0.62, nextMilestone:{name:'Запуск UAT', due:'2025-10-28'}, need:[ 'Надати доступ до 1С','Підтвердити UAT-сценарії','Призначити UAT-лід' ] },
+    milestones:[
+      {name:'Розгортання системи', due:'2025-09-30', owner:'DevOps', criteria:'Prod-ready', state:'done'},
+      {name:'Налаштування PO',  due:'2025-10-08', owner:'FBPM',   criteria:'PO flow',   state:'done'},
+      {name:'Імпорт актів',     due:'2025-10-20', owner:'FBPM',   criteria:'Acts >= 80%', state:'now'},
+      {name:'Запуск UAT',       due:'2025-10-28', owner:'PM',     criteria:'UAT plan',   state:'next'},
+      {name:'Пром-реліз',       due:'2025-11-10', owner:'PM',     criteria:'Go-live',    state:'next'}
+    ],
+    diff:[ {t:'+2 задач завершено'},{t:'-1 блокер (OCR таймаут) вирішено'},{t:'+1 новий CR: додати статуси документів у попап'} ],
+    filters:['Фаза: Пілот','Модуль: PO','Відповідальний: PM','Тиждень: поточний'],
+    docs:[
+      {title:'SOW · Договір',         type:'SOW',          status:'Approved', link:'#', owner:'Legal',     updated:'2025-10-10'},
+      {title:'ТЗ · FBPM для ІР',      type:'Spec',         status:'Draft',    link:'#', owner:'PM',        updated:'2025-10-17'},
+      {title:'Архітектура · Інтеграції', type:'Architecture', status:'Approved', link:'#', owner:'Architect', updated:'2025-10-12'}
     ]
+  }
 
-    const DATA = { status:{ phase:'Пілот', scope:'g', schedule:'y', budget:'g', completion:0.62, nextMilestone:{name:'Запуск UAT', due:'2025-10-28'}, need:[ 'Надати доступ до 1С','Підтвердити UAT-сценарії','Призначити UAT-лід' ] }, milestones:[ {name:'Розгортання системи', due:'2025-09-30', owner:'DevOps', criteria:'Prod-ready', state:'done'}, {name:'Налаштування PO', due:'2025-10-08', owner:'FBPM', criteria:'PO flow', state:'done'}, {name:'Імпорт актів', due:'2025-10-20', owner:'FBPM', criteria:'Acts >= 80%', state:'now'}, {name:'Запуск UAT', due:'2025-10-28', owner:'PM', criteria:'UAT plan', state:'next'}, {name:'Пром-реліз', due:'2025-11-10', owner:'PM', criteria:'Go-live', state:'next'} ], diff:[ {t:'+2 задач завершено'},{t:'-1 блокер (OCR таймаут) вирішено'},{t:'+1 новий CR: додати статуси документів у попап'} ], filters:['Фаза: Пілот','Модуль: PO','Відповідальний: PM','Тиждень: поточний'], docs:[ {title:'SOW · Договір', type:'SOW', status:'Approved', link:'#', owner:'Legal', updated:'2025-10-10'}, {title:'ТЗ · FBPM для ІР', type:'Spec', status:'Draft', link:'#', owner:'PM', updated:'2025-10-17'}, {title:'Архітектура · Інтеграції', type:'Architecture', status:'Approved', link:'#', owner:'Architect', updated:'2025-10-12'} ] }
+  let TASKS = []
+  let INTERACTIONS = []
 
-    let TASKS = []
-    let INTERACTIONS = []
+  const LS_DONE = 'fbpm_plan_doneMap'
+  const LS_HIST = 'fbpm_hist'
+  const loadJSON = (k,def)=>{ try{ const r=localStorage.getItem(k); return r?JSON.parse(r):def }catch{ return def } }
+  const saveJSON = (k,v)=>{ try{ localStorage.setItem(k, JSON.stringify(v)) }catch{} }
+  let DONE_MAP = loadJSON(LS_DONE, {})
 
-    const LS_DONE = 'fbpm_plan_doneMap'
-    const LS_HIST = 'fbpm_hist'
-    const loadJSON = (k,def)=>{ try{ const r=localStorage.getItem(k); return r?JSON.parse(r):def }catch{ return def } }
-    const saveJSON = (k,v)=>{ try{ localStorage.setItem(k, JSON.stringify(v)) }catch{} }
-    let DONE_MAP = loadJSON(LS_DONE, {})
+  const el = sel => document.querySelector(sel)
+  const qsAll = sel => Array.from(document.querySelectorAll(sel))
+  const daysLeft = dateStr => { const d = new Date(dateStr); const now = new Date(); const diff = Math.ceil((d - now)/86400000); return diff < 0 ? `прострочено на ${Math.abs(diff)} дн.` : diff }
+  const mailtoPM = () => MAIL || 'mailto:pm@example.com?subject=Питання щодо FBPM&body=Привіт!'
+  const trimStageTitle = s => { const idx = s.indexOf('. '); return idx>0 ? s.slice(idx+2) : s }
 
-    const el = sel => document.querySelector(sel)
-    const qsAll = sel => Array.from(document.querySelectorAll(sel))
-    const daysLeft = dateStr => { const d = new Date(dateStr); const now = new Date(); const diff = Math.ceil((d - now)/86400000); return diff < 0 ? `прострочено на ${Math.abs(diff)} дн.` : diff }
-    const mailtoPM = () => 'mailto:pm@example.com?subject=Питання щодо FBPM&body=Привіт!'
-    const trimStageTitle = s => { const idx = s.indexOf('. '); return idx>0 ? s.slice(idx+2) : s }
-    const isDone = t => ((t.status||'').toLowerCase().includes('done')|| (t.status||'').toLowerCase().includes('closed')|| (t.status||'').toLowerCase().includes('заверш'))
-    const isInProgress = t => { const s=(t.status||'').toLowerCase(); return s.includes('in progress')||s.includes('в роботі')||s.includes('active')||s.includes('триває') }
-    const isWaiting = t => { const s=(t.status||'').toLowerCase(); return s.includes('waiting')||s.includes('pending')||s.includes('очікуван') }
-    const byEtaAsc = (a,b)=> new Date(a.eta||'2100-12-31') - new Date(b.eta||'2100-12-31')
-    function currentStageName(){ for (const s of PLAN){ const all=s.tasks.length; const done=s.tasks.filter(t=> DONE_MAP[s.id+':'+t.id]).length; if(done<all) return `Етап ${s.id}. ${trimStageTitle(s.title)}` } const last=PLAN[PLAN.length-1]; return `Етап ${last.id}. ${trimStageTitle(last.title)}` }
+  function isDone(t){
+    const s=(t.status||'').toLowerCase()
+    return s.includes('done') || s.includes('closed') || s.includes('заверш')
+  }
+  function isInProgress(t){
+    const s=(t.status||'').toLowerCase().replace(/\s+/g,'')
+    return s.includes('inprogress') || s.includes('вроботі') || s.includes('триває')
+  }
+  function isWaiting(t){
+    const s=(t.status||'').toLowerCase()
+    return s.includes('waiting') || s.includes('pending') || s.includes('очікуван') || s.includes('onhold')
+  }
+  const byEtaAsc = (a,b)=> new Date(a.eta||'2100-12-31') - new Date(b.eta||'2100-12-31')
 
-    function renderHero(){
-      el('#phase').textContent = currentStageName()
-      const total = TASKS.length || 0
-      const done = TASKS.filter(isDone).length
-      el('#pct').textContent = total? Math.round(done/total*100)+'%' : '—'
-      const active = TASKS.filter(isInProgress).sort(byEtaAsc)[0]
-      const ordered = TASKS.slice().sort(byEtaAsc)
-      const idx = active? ordered.findIndex(t=>t.id===active.id) : -1
-      const next = idx>=0 ? (ordered.slice(idx+1).reverse().find(t=>!isDone(t)) || ordered[ordered.length-1]) : ordered.find(t=>!isDone(t))
-      el('#nextM').textContent = active? (next? next.title : '—') : (ordered[0]?.title||'—')
-      const ms = DATA.milestones.find(m=>m.state==='next' || m.state==='now')
-      el('#ddays').textContent = daysLeft((ms&&ms.due)||DATA.status.nextMilestone.due)
-      el('#scopeDot').className = 'dot ' + (DATA.status.scope||'g')
-      el('#schedDot').className = 'dot ' + (DATA.status.schedule||'g')
-      el('#budgetDot').className = 'dot ' + (DATA.status.budget||'g')
-      ;['need1','need2','need3'].forEach((id,i)=>{ el('#'+id).textContent = DATA.status.need[i] || '' })
-      el('#askPM').setAttribute('href', mailtoPM())
+  function currentStageName(){
+    for (const s of PLAN){
+      const all=s.tasks.length
+      const done=s.tasks.filter(t=> DONE_MAP[s.id+':'+t.id]).length
+      if(done<all) return `Етап ${s.id}. ${trimStageTitle(s.title)}`
     }
+    const last=PLAN[PLAN.length-1]
+    return `Етап ${last.id}. ${trimStageTitle(last.title)}`
+  }
 
-    function renderKPI(){
-      const total = TASKS.length
-      const done = TASKS.filter(isDone).length
-      const overdue = TASKS.filter(t=> new Date(t.eta||'2100-12-31') < new Date() && !isDone(t)).length
-      const waiting = TASKS.filter(isWaiting).length
-      const modReady = total? Math.round(done/total*100) : 0
-      el('#k_done').textContent = String(done)
-      el('#k_over').textContent = String(overdue)
-      el('#k_dec').textContent  = String(waiting)
-      el('#k_mod').textContent  = modReady + '%'
-    }
+  function heroPlanPct(){
+    const total = PLAN.reduce((s,p)=> s + p.tasks.length, 0)
+    const done  = PLAN.reduce((s,p)=> s + p.tasks.filter(t => DONE_MAP[p.id+':'+t.id]).length, 0)
+    return total ? Math.round(done/total*100) : 0
+  }
 
-    function renderMilestones(){ const box = el('#marks'); box.innerHTML = ''
-      DATA.milestones.forEach(m=>{ const div = document.createElement('div'); div.className = 'mark ' + m.state
-        div.innerHTML = '<div class="when">'+m.due+'</div><div class="name">'+m.name+'</div><div class="muted">'+m.owner+'</div>'
-        div.title = 'Критерії: '+m.criteria; box.appendChild(div) })
-      const idxNow = DATA.milestones.findIndex(x=>x.state==='now')
-      const after = idxNow>=0 ? DATA.milestones[idxNow+1] : DATA.milestones.find(x=>x.state==='next')
-      if(after){ DATA.status.nextMilestone = { name: after.name, due: after.due } }
-    }
+  function renderHero(){
+    el('#phase').textContent = currentStageName()
 
-    function renderGantt(){
-      const tasks = TASKS.filter(t=> t.eta)
-      const host = document.querySelector('#ms-title').parentElement.parentElement
-      let svg = host.querySelector('svg.gantt')
-      if(!tasks.length){ if(svg) svg.remove(); return }
-      const min = new Date(Math.min(...tasks.map(t=>+new Date(t.eta))));
-      const max = new Date(Math.max(...tasks.map(t=>+new Date(t.eta))));
-      const pad = 24, rowH = 18, w = host.clientWidth-32, h = (tasks.length*rowH)+pad*2
-      const x = d => pad + ( (new Date(d)-min) / (max-min || 1) ) * (w-pad*2)
-      const bars = tasks.map((t,i)=>({ y: pad + i*rowH, x0: pad, x1: x(t.eta), label: (t.title||'') }))
-      const ns='http://www.w3.org/2000/svg'
-      if(svg) svg.remove(); svg = document.createElementNS(ns,'svg'); svg.setAttribute('class','gantt'); svg.setAttribute('width','100%'); svg.setAttribute('height',String(h))
-      const axis = document.createElementNS(ns,'line'); axis.setAttribute('x1',pad); axis.setAttribute('y1',pad/2); axis.setAttribute('x2',w-pad); axis.setAttribute('y2',pad/2); axis.setAttribute('stroke','#D7D5F4'); svg.appendChild(axis)
-      bars.forEach(b=>{ const r=document.createElementNS(ns,'rect'); r.setAttribute('x',b.x0); r.setAttribute('y',b.y); r.setAttribute('width',Math.max(6,b.x1-b.x0)); r.setAttribute('height',10); r.setAttribute('rx',5); r.setAttribute('fill','url(#g)'); svg.appendChild(r); const t=document.createElementNS(ns,'text'); t.setAttribute('x',b.x1+6); t.setAttribute('y',b.y+9); t.setAttribute('font-size','11'); t.setAttribute('fill','#4B5563'); t.textContent=b.label; svg.appendChild(t) })
-      const defs=document.createElementNS(ns,'defs'); const grad=document.createElementNS(ns,'linearGradient'); grad.setAttribute('id','g'); grad.setAttribute('x1','0'); grad.setAttribute('x2','1'); grad.innerHTML='<stop offset="0%" stop-color="#392EC9"/><stop offset="100%" stop-color="#EF0650"/>'
-      defs.appendChild(grad); svg.appendChild(defs)
-      host.appendChild(svg)
-    }
+    // % завершення з Плану (DONE_MAP)
+    const pct = heroPlanPct()
+    el('#pct').textContent = pct + '%'
 
-    function renderDiff(){ const d = el('#diff'); d.innerHTML = ''
-      DATA.diff.forEach(x=>{ const li=document.createElement('li'); li.className='item'; li.textContent=x.t; d.appendChild(li) })
-      const f = el('#filters'); f.innerHTML=''; DATA.filters.forEach(x=>{ const s=document.createElement('span'); s.className='chip'; s.textContent=x; f.appendChild(s) }) }
+    // Активний таск: InProgress; Наступний — останній після активного
+    const active = TASKS.filter(isInProgress).sort(byEtaAsc)[0]
+    const ordered = TASKS.slice().sort(byEtaAsc)
+    const idx = active? ordered.findIndex(t=>t.id===active.id) : -1
+    const next = idx>=0 ? (ordered.slice(idx+1).reverse().find(t=>!isDone(t)) || ordered[ordered.length-1]) : ordered.find(t=>!isDone(t))
+    el('#nextM').textContent = active? (next? next.title : '—') : (ordered[0]?.title||'—')
 
-    function renderDocs(filter){ const box = el('#docs'); box.innerHTML=''
-      DATA.docs.filter(d => !filter || d.status===filter).forEach(d=>{ const c=document.createElement('div'); c.className='card'
-        c.innerHTML = '<div class="muted">'+d.type+' · '+d.status+'</div><div class="title" style="margin:4px 0 6px">'+d.title+'</div><a class="btn" href="'+d.link+'">Відкрити</a><div class="muted" style="margin-top:6px">'+d.owner+' · '+d.updated+'</div>'
-        box.appendChild(c) }) }
+    const ms = DATA.milestones.find(m=>m.state==='next' || m.state==='now')
+    el('#ddays').textContent = daysLeft((ms&&ms.due)||DATA.status.nextMilestone.due)
+    el('#scopeDot').className = 'dot ' + (DATA.status.scope||'g')
+    el('#schedDot').className = 'dot ' + (DATA.status.schedule||'g')
+    el('#budgetDot').className = 'dot ' + (DATA.status.budget||'g')
+    ;['need1','need2','need3'].forEach((id,i)=>{ el('#'+id).textContent = DATA.status.need[i] || '' })
+    el('#askPM').setAttribute('href', mailtoPM())
+  }
 
-    function mapType(t){ const s=(t||'').toString().trim().toLowerCase(); if(['task','таск','завдання'].includes(s)) return 'task'; if(['meeting','зустріч'].includes(s)) return 'зустріч'; if(['decision','рішення'].includes(s)) return 'рішення'; if(['question','питання'].includes(s)) return 'питання'; if(['note','нотатка'].includes(s)) return 'нотатка'; if(['answer','відповідь'].includes(s)) return 'відповідь'; return 'нотатка' }
+  function renderKPI(){
+    const total = TASKS.length
+    const done = TASKS.filter(isDone).length
+    const overdue = TASKS.filter(t=> new Date(t.eta||'2100-12-31') < new Date() && !isDone(t)).length
+    const waiting = TASKS.filter(isWaiting).length
+    const modReady = total? Math.round(done/total*100) : 0
+    el('#k_done').textContent = String(done)
+    el('#k_over').textContent = String(overdue)
+    el('#k_dec').textContent  = String(waiting)
+    el('#k_mod').textContent  = modReady + '%'
+  }
 
-    function renderHistory(items){ const body=el('#histBody'); body.innerHTML=''; const tag=(el('#searchTag').value||'').trim().toLowerCase(); items.filter(m=>!tag||(((m.summary||'')+' '+(m.title||'')).toLowerCase().includes(tag))).slice(0,10).forEach(m=>{ const tr=document.createElement('tr'); const link=m.link? '<a href="'+m.link+'" target="_blank" rel="noopener">Лінк</a>' : ''; const dateStr=(new Date(m.date)).toLocaleDateString('uk-UA'); tr.innerHTML = '<td>'+dateStr+'</td><td>'+m.type+'</td><td>'+(m.title||'')+'</td><td>'+(m.summary||'')+'</td><td>'+link+'</td>'; body.appendChild(tr) }) }
+  function renderMilestones(){
+    const box = el('#marks'); box.innerHTML = ''
+    DATA.milestones.forEach(m=>{
+      const div = document.createElement('div'); div.className = 'mark ' + m.state
+      div.innerHTML = '<div class="when">'+m.due+'</div><div class="name">'+m.name+'</div><div class="muted">'+m.owner+'</div>'
+      div.title = 'Критерії: '+m.criteria; box.appendChild(div)
+    })
+    const idxNow = DATA.milestones.findIndex(x=>x.state==='now')
+    const after = idxNow>=0 ? DATA.milestones[idxNow+1] : DATA.milestones.find(x=>x.state==='next')
+    if(after){ DATA.status.nextMilestone = { name: after.name, due: after.due } }
+  }
 
-    async function histLoad(){ try{ const r = await fetch(HIST_GET_ENDPOINT, { method:'GET' }); if(!r.ok) throw new Error(r.status); const raw = await r.text(); let j; try{ j = JSON.parse(raw) }catch{ console.warn('hist JSON parse fail'); return } let list=[]; if(Array.isArray(j)){ list = Array.isArray(j[0] && j[0].list)? j[0].list : j } else if (j && Array.isArray(j.list)){ list = j.list } const norm = (list||[]).map((x,i)=>({ id: String((x && (x.ExtID || x.id)) || (Date.now()+'-'+i)), date: (x && (x.DateEdit || x.date)) || new Date().toISOString(), type: mapType(x && (x.Type || x.type)), title: (x && (x.Name || x.title)) || '', summary: (x && (x.Description || x.summary)) || '', link: (x && x.link) || '', status: (x && (x.Status || x.status)) || '', eta: (x && (x.ETA || x.eta || x.due)) || '', owner: (x && (x.Owner || x.owner)) || '', prio: (x && (x.Priority || x.prio)) || '', phase: (x && (x.Phase || x.phase)) || '', mod: (x && (x.Module || x.mod)) || '' }))
+  function renderGantt(){
+    const tasks = TASKS.filter(t=> t.eta)
+    const host = document.querySelector('#ms-title').parentElement.parentElement
+    let svg = host.querySelector('svg.gantt')
+    if(!tasks.length){ if(svg) svg.remove(); return }
+    const min = new Date(Math.min(...tasks.map(t=>+new Date(t.eta))));
+    const max = new Date(Math.max(...tasks.map(t=>+new Date(t.eta))));
+    const pad = 24, rowH = 18, w = host.clientWidth-32, h = (tasks.length*rowH)+pad*2
+    const x = d => pad + ( (new Date(d)-min) / (max-min || 1) ) * (w-pad*2)
+    const bars = tasks.map((t,i)=>({ y: pad + i*rowH, x0: pad, x1: x(t.eta), label: (t.title||'') }))
+    const ns='http://www.w3.org/2000/svg'
+    if(svg) svg.remove(); svg = document.createElementNS(ns,'svg'); svg.setAttribute('class','gantt'); svg.setAttribute('width','100%'); svg.setAttribute('height',String(h))
+    const axis = document.createElementNS(ns,'line'); axis.setAttribute('x1',pad); axis.setAttribute('y1',pad/2); axis.setAttribute('x2',w-pad); axis.setAttribute('y2',pad/2); axis.setAttribute('stroke','#D7D5F4'); svg.appendChild(axis)
+    bars.forEach(b=>{
+      const r=document.createElementNS(ns,'rect'); r.setAttribute('x',b.x0); r.setAttribute('y',b.y); r.setAttribute('width',Math.max(6,b.x1-b.x0)); r.setAttribute('height',10); r.setAttribute('rx',5); r.setAttribute('fill','url(#g)'); svg.appendChild(r)
+      const t=document.createElementNS(ns,'text'); t.setAttribute('x',b.x1+6); t.setAttribute('y',b.y+9); t.setAttribute('font-size','11'); t.setAttribute('fill','#4B5563'); t.textContent=b.label; svg.appendChild(t)
+    })
+    const defs=document.createElementNS(ns,'defs')
+    const grad=document.createElementNS(ns,'linearGradient'); grad.setAttribute('id','g'); grad.setAttribute('x1','0'); grad.setAttribute('x2','1'); grad.innerHTML='<stop offset="0%" stop-color="#392EC9"/><stop offset="100%" stop-color="#EF0650"/>'
+    defs.appendChild(grad); svg.appendChild(defs)
+    host.appendChild(svg)
+  }
+
+  function renderDiff(){
+    const d = el('#diff'); d.innerHTML = ''
+    DATA.diff.forEach(x=>{ const li=document.createElement('li'); li.className='item'; li.textContent=x.t; d.appendChild(li) })
+    const f = el('#filters'); f.innerHTML=''
+    DATA.filters.forEach(x=>{ const s=document.createElement('span'); s.className='chip'; s.textContent=x; f.appendChild(s) })
+  }
+
+  function renderDocs(filter){
+    const box = el('#docs'); box.innerHTML=''
+    DATA.docs.filter(d => !filter || d.status===filter).forEach(d=>{
+      const c=document.createElement('div'); c.className='card'
+      c.innerHTML = '<div class="muted">'+d.type+' · '+d.status+'</div><div class="title" style="margin:4px 0 6px">'+d.title+'</div><a class="btn" href="'+d.link+'">Відкрити</a><div class="muted" style="margin-top:6px">'+d.owner+' · '+d.updated+'</div>'
+      box.appendChild(c)
+    })
+  }
+
+  function mapType(t){
+    const s=(t||'').toString().trim().toLowerCase()
+    if (['task','таск','завдання','таcк','тask'].includes(s)) return 'task'
+    if (['meeting','зустріч'].includes(s)) return 'зустріч'
+    if (['decision','рішення'].includes(s)) return 'рішення'
+    if (['question','питання'].includes(s)) return 'питання'
+    if (['answer','відповідь'].includes(s)) return 'відповідь'
+    if (['note','нотатка'].includes(s)) return 'нотатка'
+    return 'нотатка'
+  }
+
+  function renderHistory(items){
+    const body=el('#histBody'); body.innerHTML=''
+    const tag=(el('#searchTag').value||'').trim().toLowerCase()
+    items
+      .filter(m=>!tag||(((m.summary||'')+' '+(m.title||'')).toLowerCase().includes(tag)))
+      .slice(0,10)
+      .forEach(m=>{
+        const tr=document.createElement('tr')
+        const link=m.link? '<a href="'+m.link+'" target="_blank" rel="noopener">Лінк</a>' : ''
+        const dateStr=(new Date(m.date)).toLocaleDateString('uk-UA')
+        tr.innerHTML = '<td>'+dateStr+'</td><td>'+m.type+'</td><td>'+(m.title||'')+'</td><td>'+(m.summary||'')+'</td><td>'+link+'</td>'
+        body.appendChild(tr)
+      })
+  }
+
+  async function histLoad(){
+    try{
+      const r = await fetch(HIST_GET_ENDPOINT, { method:'GET' })
+      if(!r.ok) throw new Error(r.status)
+      const raw = await r.text()
+      let j; try{ j = JSON.parse(raw) }catch{ console.warn('hist JSON parse fail'); return }
+      let list=[]
+      if(Array.isArray(j)){ list = Array.isArray(j[0] && j[0].list)? j[0].list : j }
+      else if (j && Array.isArray(j.list)){ list = j.list }
+      const norm = (list||[]).map((x,i)=>({
+        id: String((x?.ExtID || x?.id) || (Date.now()+'-'+i)),
+        date: (x?.DateEdit || x?.date || x?.Date || new Date().toISOString()),
+        type: mapType(x?.Type || x?.type),
+        title: (x?.Name || x?.title) || '',
+        summary: (x?.Description || x?.Text || x?.summary) || '',
+        link: (x?.Link || x?.link) || '',
+        status: (x?.Status || x?.status) || '',
+        eta: (x?.ETA || x?.eta || x?.due || x?.DueDate || ''),
+        owner: (x?.Owner || x?.owner || x?.Assignee || ''),
+        prio: (x?.Priority || x?.prio || x?.PriorityName || ''),
+        phase: (x?.Phase || x?.phase || ''),
+        mod: (x?.Module || x?.mod || '')
+      }))
       TASKS = norm.filter(x=> x.type==='task').sort(byEtaAsc)
       INTERACTIONS = norm.filter(x=> x.type!=='task').sort((a,b)=> new Date(b.date)-new Date(a.date))
       saveJSON(LS_HIST, INTERACTIONS)
       renderHistory(INTERACTIONS); renderTasks('all','all'); renderKPI(); renderMilestones(); renderHero(); renderGantt()
-    }catch(e){ const cached=loadJSON(LS_HIST,[]); renderHistory(cached); renderTasks('all','all'); renderKPI(); renderMilestones(); renderHero(); renderGantt() } }
+    }catch(e){
+      const cached=loadJSON(LS_HIST,[])
+      renderHistory(cached); renderTasks('all','all'); renderKPI(); renderMilestones(); renderHero(); renderGantt()
+    }
+  }
 
-    function addHist(){ const title=el('#histTitle').value.trim(); const summary=el('#histSummary').value.trim(); const type=el('#histType').value; const link=el('#histLink').value.trim(); if(!title && !summary) return; const cur=loadJSON(LS_HIST,[]); const it={ id: String(Date.now()), date: new Date().toISOString(), type, title, summary, link }; const next=[it, ...cur]; saveJSON(LS_HIST,next); renderHistory(next); el('#histTitle').value=''; el('#histSummary').value=''; el('#histLink').value=''; }
+  async function addHist(){
+    const title=el('#histTitle').value.trim()
+    const summary=el('#histSummary').value.trim()
+    const type=el('#histType').value
+    const link=el('#histLink').value.trim()
+    if(!title && !summary) return
 
-    let STAGE_FILTER='all'; let ROLE_FILTER=new Set(['executor','client','both'])
-    function renderPlan(){ const box=el('#planWrap'); box.innerHTML=''; PLAN.filter(s=> STAGE_FILTER==='all' || s.period===STAGE_FILTER).forEach(s=>{ const stage=document.createElement('div'); stage.className='stage'; const all=s.tasks.length; const done=s.tasks.filter(t=> DONE_MAP[s.id+':'+t.id]).length; const pct=Math.round(done/Math.max(1,all)*100); const headingTitle='Етап '+s.id+' · '+trimStageTitle(s.title); stage.innerHTML='<div class="row" style="justify-content:space-between;align-items:center"><div><div class="title">'+headingTitle+'</div><div class="muted">Тривалість: '+s.duration+' · Мета: '+s.goal+'</div></div><div class="muted">Прогрес: <strong>'+done+'/'+all+' ('+pct+'%)</strong></div></div>'; const grid=document.createElement('div'); grid.className='row'; grid.style.gap='16px'; const left=document.createElement('div'); left.style.flex='2'; const right=document.createElement('aside'); right.style.flex='1'; s.tasks.filter(t=> ROLE_FILTER.has(t.role)).forEach(t=>{ const k=s.id+':'+t.id; const mark=!!DONE_MAP[k]; const line=document.createElement('div'); line.className='task'; const cbId='cb_'+k; const roleCls = t.role==='executor'? 'role-ex' : (t.role==='client'? 'role-cl' : 'role-bo'); line.innerHTML='<input id="'+cbId+'" type="checkbox" '+(mark?'checked':'')+' style="margin-top:4px">'+'<label for="'+cbId+'" style="flex:1">'+t.id+' · '+t.text+'</label>'+'<span class="badge '+roleCls+'">'+(t.role==='executor'?'виконавець':(t.role==='client'?'клієнт':'разом'))+'</span>'; left.appendChild(line); line.querySelector('input').addEventListener('change',(e)=>{ DONE_MAP[k]=e.target.checked; saveJSON(LS_DONE,DONE_MAP); renderPlan(); renderHero() }) }); const resTitle=document.createElement('div'); resTitle.className='title'; resTitle.style.marginBottom='6px'; resTitle.textContent='Результати етапу'; right.appendChild(resTitle); const ul=document.createElement('ul'); ul.className='list'; s.results.forEach(r=>{ const li=document.createElement('li'); li.className='item'; li.textContent=r; ul.appendChild(li) }); right.appendChild(ul); grid.appendChild(left); grid.appendChild(right); stage.appendChild(grid); box.appendChild(stage) }) }
+    const it={ id: String(Date.now()), date: new Date().toISOString(), type, title, summary, link }
 
-    function renderTasks(filterKey, filterVal){ const body = el('#taskBody'); body.innerHTML=''; const src = (filterKey==='all')? TASKS : TASKS.filter(t=> !filterKey || (t[filterKey]===filterVal)); src.forEach(t=>{ const tr=document.createElement('tr'); tr.innerHTML='<td>'+(t.title||t.name||'')+'</td><td>'+(t.prio||t.priority||'')+'</td><td>'+(t.owner||'')+'</td><td>'+(t.eta||'')+'</td><td>'+(t.status||'')+'</td>'; body.appendChild(tr) }) }
+    try{
+      await fetch(HIST_POST_ENDPOINT, {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ list:[it] })
+      })
+    }catch(e){ console.warn('POST fail, caching locally', e) }
 
-    renderDiff(); renderDocs(); renderPlan(); renderMilestones(); histLoad()
+    const cur=loadJSON(LS_HIST,[])
+    const next=[it, ...cur]
+    saveJSON(LS_HIST,next)
+    renderHistory(next)
+    el('#histTitle').value=''; el('#histSummary').value=''; el('#histLink').value=''
+  }
 
-    function toggleActiveChip(chips, target){ chips.forEach(x=>x.classList.remove('active')); target.classList.add('active') }
-    qsAll('[data-f]').forEach(ch => ch.addEventListener('click', () => { const [k,v] = ch.dataset.f.split(':'); renderTasks(k, v); toggleActiveChip(qsAll('[data-f]'), ch); }))
-    qsAll('[data-sf]').forEach(ch => ch.addEventListener('click', () => { STAGE_FILTER = ch.dataset.sf; renderPlan(); toggleActiveChip(qsAll('[data-sf]'), ch) }))
-    qsAll('[data-rf]').forEach(ch => ch.addEventListener('click', () => { const v = ch.dataset.rf; ch.classList.toggle('active'); if(ROLE_FILTER.has(v)) ROLE_FILTER.delete(v); else ROLE_FILTER.add(v); renderPlan() }))
-    qsAll('[data-docf]').forEach(ch => ch.addEventListener('click', () => { qsAll('[data-docf]').forEach(x=>x.classList.remove('active')); ch.classList.add('active'); renderDocs(ch.dataset.docf) }))
-    el('#searchTag').addEventListener('input', ()=>{ renderHistory(INTERACTIONS) })
-    el('#histAdd').addEventListener('click', addHist)
-    el('#btnFilters').addEventListener('click', ()=>alert('Фільтри: фаза · модуль · відповідальний · період (TODO: модальне вікно)'))
-  </script>
+  let STAGE_FILTER='all'
+  let ROLE_FILTER=new Set(['executor','client','both'])
+
+  function renderPlan(){
+    const box=el('#planWrap'); box.innerHTML=''
+    PLAN.filter(s=> STAGE_FILTER==='all' || s.period===STAGE_FILTER).forEach(s=>{
+      const stage=document.createElement('div'); stage.className='stage'
+      const all=s.tasks.length
+      const done=s.tasks.filter(t=> DONE_MAP[s.id+':'+t.id]).length
+      const pct=Math.round(done/Math.max(1,all)*100)
+      const headingTitle='Етап '+s.id+' · '+trimStageTitle(s.title)
+      stage.innerHTML='<div class="row" style="justify-content:space-between;align-items:center"><div><div class="title">'+headingTitle+'</div><div class="muted">Тривалість: '+s.duration+' · Мета: '+s.goal+'</div></div><div class="muted">Прогрес: <strong>'+done+'/'+all+' ('+pct+'%)</strong></div></div>'
+      const grid=document.createElement('div'); grid.className='row'; grid.style.gap='16px'
+      const left=document.createElement('div'); left.style.flex='2'
+      const right=document.createElement('aside'); right.style.flex='1'
+      s.tasks.filter(t=> ROLE_FILTER.has(t.role)).forEach(t=>{
+        const k=s.id+':'+t.id; const mark=!!DONE_MAP[k]
+        const line=document.createElement('div'); line.className='task'
+        const cbId='cb_'+k
+        const roleCls = t.role==='executor'? 'role-ex' : (t.role==='client'? 'role-cl' : 'role-bo')
+        line.innerHTML='<input id="'+cbId+'" type="checkbox" '+(mark?'checked':'')+' style="margin-top:4px">' +
+          '<label for="'+cbId+'" style="flex:1">'+t.id+' · '+t.text+'</label>' +
+          '<span class="badge '+roleCls+'">'+(t.role==='executor'?'виконавець':(t.role==='client'?'клієнт':'разом'))+'</span>'
+        left.appendChild(line)
+        line.querySelector('input').addEventListener('change',(e)=>{
+          DONE_MAP[k]=e.target.checked; saveJSON(LS_DONE,DONE_MAP); renderPlan(); renderHero()
+        })
+      })
+      const resTitle=document.createElement('div'); resTitle.className='title'; resTitle.style.marginBottom='6px'; resTitle.textContent='Результати етапу'
+      right.appendChild(resTitle)
+      const ul=document.createElement('ul'); ul.className='list'
+      s.results.forEach(r=>{ const li=document.createElement('li'); li.className='item'; li.textContent=r; ul.appendChild(li) })
+      right.appendChild(ul)
+      grid.appendChild(left); grid.appendChild(right); stage.appendChild(grid); box.appendChild(stage)
+    })
+  }
+
+  function renderTasks(filterKey, filterVal){
+    const body = el('#taskBody'); body.innerHTML=''
+    const src = (filterKey==='all')? TASKS : TASKS.filter(t=> !filterKey || (t[filterKey]===filterVal))
+    src.forEach(t=>{
+      const tr=document.createElement('tr')
+      tr.innerHTML='<td>'+(t.title||t.name||'')+'</td><td>'+(t.prio||t.priority||'')+'</td><td>'+(t.owner||'')+'</td><td>'+(t.eta||'')+'</td><td>'+(t.status||'')+'</td>'
+      body.appendChild(tr)
+    })
+  }
+
+  // --- initial renders ---
+  renderDiff()
+  renderDocs()
+  renderPlan()
+  renderMilestones()
+  histLoad()
+
+  // --- interactions ---
+  function toggleActiveChip(chips, target){ chips.forEach(x=>x.classList.remove('active')); target.classList.add('active') }
+  qsAll('[data-f]').forEach(ch => ch.addEventListener('click', () => {
+    const [k,v] = ch.dataset.f.split(':')
+    renderTasks(k, v)
+    toggleActiveChip(qsAll('[data-f]'), ch)
+  }))
+  qsAll('[data-sf]').forEach(ch => ch.addEventListener('click', () => {
+    STAGE_FILTER = ch.dataset.sf
+    renderPlan()
+    toggleActiveChip(qsAll('[data-sf]'), ch)
+  }))
+  qsAll('[data-rf]').forEach(ch => ch.addEventListener('click', () => {
+    const v = ch.dataset.rf
+    ch.classList.toggle('active')
+    if(ROLE_FILTER.has(v)) ROLE_FILTER.delete(v); else ROLE_FILTER.add(v)
+    renderPlan()
+  }))
+  qsAll('[data-docf]').forEach(ch => ch.addEventListener('click', () => {
+    qsAll('[data-docf]').forEach(x=>x.classList.remove('active'))
+    ch.classList.add('active')
+    renderDocs(ch.dataset.docf)
+  }))
+  el('#searchTag').addEventListener('input', ()=>{ renderHistory(INTERACTIONS) })
+  el('#histAdd').addEventListener('click', addHist)
+  el('#btnFilters').addEventListener('click', ()=>alert('Фільтри: фаза · модуль · відповідальний · період (TODO: модальне вікно)'))
+</script>
+
 </body>
 </html>
